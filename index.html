@@ -1,0 +1,731 @@
+import React, { useState, useMemo } from "react";
+import {
+  Heart, Baby, FileText, PiggyBank, ChevronRight, ChevronDown, Check,
+  MapPin, Search, Stethoscope, AlertCircle, Sparkles, Calendar, CircleDollarSign,
+  Sun, Phone, HeartPulse, Sprout, Star,
+} from "lucide-react";
+
+/* ============================================================
+   THE INISFREE COLLECTIVE — a Canada-specific parent OS  (v3)
+   + "The First Few Days" pillar (Baby track / You track)
+   + smart-surfaced when stage = newborn
+   + provider comparison (OB / midwife / family doctor)
+   Palette anchored to Inisfree blush #EDD5D5. Figures 2026.
+   ============================================================ */
+
+const C = {
+  blush: "#EDD5D5", cream: "#FBF4F1", creamCard: "#FFFBF9",
+  ink: "#33292B", inkSoft: "#6B5559", inkFaint: "#A98E92",
+  plum: "#7A4A52", sage: "#9CA88E", terracotta: "#C77F5E",
+  rose: "#B56B72", olive: "#7D8A66", clay: "#A86A4F",
+  dusk: "#8C6A78", line: "#E8D6D6",
+};
+
+const PROVINCES = [
+  { code: "ON", name: "Ontario" }, { code: "BC", name: "British Columbia" },
+  { code: "AB", name: "Alberta" }, { code: "QC", name: "Quebec" },
+  { code: "MB", name: "Manitoba" }, { code: "SK", name: "Saskatchewan" },
+  { code: "NS", name: "Nova Scotia" }, { code: "NB", name: "New Brunswick" },
+  { code: "NL", name: "Newfoundland & Labrador" }, { code: "PE", name: "Prince Edward Island" },
+  { code: "Other", name: "Territories / Other" },
+];
+
+const EI = { maxStd: 729, maxExt: 437, mie: 68900, rate: 0.55, extRate: 0.33 };
+
+const STAGES = [
+  { id: "trying", label: "Trying to conceive", sub: "Or thinking about it", icon: Sprout },
+  { id: "expecting", label: "Expecting", sub: "Pregnant or planning", icon: Heart },
+  { id: "thirdtri", label: "Third trimester", sub: "Birth prep mode", icon: Calendar },
+  { id: "newborn", label: "New baby is here", sub: "0–3 months", icon: Baby },
+  { id: "settling", label: "Settling in", sub: "3–18 months", icon: Sparkles },
+];
+
+const PILLARS = [
+  { id: "trying", title: "Before You Try", blurb: "Pre-conception checks, fertility clinics, and what Canada will fund.", icon: Sprout, accent: C.sage },
+  { id: "money", title: "Leave & Money", blurb: "EI, your employer top-up, and what actually lands in your account.", icon: CircleDollarSign, accent: C.plum },
+  { id: "birth", title: "Birth Prep", blurb: "Care provider, hospital, classes, pelvic floor, the car seat.", icon: Stethoscope, accent: C.olive },
+  { id: "firstdays", title: "The First Few Days", blurb: "Right after birth — caring for baby, and recovering yourself.", icon: Sun, accent: C.dusk },
+  { id: "newborn", title: "New Baby Logistics", blurb: "Paediatrician, vaccines, feeding support, milestones.", icon: Baby, accent: C.rose },
+  { id: "paperwork", title: "The Paperwork", blurb: "Register the birth, health card, SIN, passport — in the right order.", icon: FileText, accent: C.clay },
+  { id: "future", title: "Setting Them Up", blurb: "RESP, Canada Child Benefit, a will, and a guardian.", icon: PiggyBank, accent: C.terracotta },
+];
+
+/* protea bloom — single inline SVG, inherits color */
+function Protea({ size = 22, color = "#fff" }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 48 48" fill="none" stroke={color}
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M24 6 C20 12 20 16 24 20 C28 16 28 12 24 6 Z" />
+      <path d="M10 12 C14 16 18 18 22 18 C20 14 16 12 10 12 Z" />
+      <path d="M38 12 C34 16 30 18 26 18 C28 14 32 12 38 12 Z" />
+      <path d="M7 24 C13 25 18 24 21 21 C16 19 11 20 7 24 Z" />
+      <path d="M41 24 C35 25 30 24 27 21 C32 19 37 20 41 24 Z" />
+      <circle cx="24" cy="24" r="6" />
+      <path d="M24 24 L24 30" /><path d="M24 24 L19 27" /><path d="M24 24 L29 27" />
+      <path d="M24 30 C24 36 24 40 24 43" />
+      <path d="M24 38 C26 36 29 35 31 35" /><path d="M24 36 C22 34 19 33 17 33" />
+    </svg>
+  );
+}
+
+function buildChecklist(prov) {
+  const isQC = prov === "QC";
+  const provName = PROVINCES.find((p) => p.code === prov)?.name || "your province";
+  return {
+    trying: [
+      { t: "Book a pre-conception visit with your doctor",
+        d: "The single best first step. Your family doctor reviews your health, medications, and family history, updates vaccines (rubella, chickenpox), and flags anything to address before pregnancy. Both partners can go.", flag: "Start here" },
+      { t: "Start folic acid now — before conceiving",
+        d: "0.4 mg daily (often higher if advised) at least 2–3 months before trying lowers the risk of neural tube defects. A pre-natal multivitamin covers it. This is one of the few things with strong, clear evidence." },
+      { t: "Get the standard pre-conception bloodwork",
+        d: "Typically: rubella and varicella immunity, hepatitis B, HIV, syphilis, blood type/Rh, ferritin/iron, thyroid (TSH), and a Pap if due. Carrier screening for genetic conditions is increasingly offered — ask." },
+      { t: "Sort the lifestyle basics (both partners)",
+        d: "Stop smoking and recreational drugs, cut alcohol, review caffeine, aim for a healthy weight, and look at sleep and stress. Sperm health matters as much as egg health — this is a two-person checklist." },
+      { t: "Track your cycle to find your fertile window",
+        d: "Most conception happens in the few days before ovulation. A simple app, ovulation predictor kits, or basal temperature tracking helps you time things. No need to over-engineer it early on." },
+      { t: "Know when to seek fertility help",
+        d: "General guidance: see a doctor after 12 months of trying if you're under 35, or after 6 months if you're 35+. Go sooner if you have irregular cycles, known reproductive conditions (PCOS, endometriosis), or a history that worries you.", flag: "Timing rule" },
+      { t: "Understand what Canada will fund",
+        d: "Coverage varies a lot by province. Ontario funds one IVF cycle per eligible patient through the Ontario Fertility Program, and from the 2025 tax year offers a refundable fertility tax credit (25% of eligible costs). BC, Quebec and others have their own programs. Check yours — it changes the math enormously.", flag: "Province-specific" },
+      { t: "Look into LGBTQ2S+ and single-parent paths",
+        d: "Donor sperm, donor eggs, IUI, reciprocal IVF, and surrogacy are all available in Canada. Many clinics (including Twig) are explicitly trans-affirming and build inclusive care plans. Funding rules differ — ask the clinic directly." },
+    ],
+    money: [
+      { t: isQC ? "Understand QPIP — Quebec's own plan (not EI)" : "Understand EI maternity + parental benefits",
+        d: isQC ? "Quebec runs its own Régime québécois d'assurance parentale (QPIP/RQAP) instead of federal EI. Rates, weeks and the waiting period differ — check rqap.gouv.qc.ca, not Service Canada."
+          : "Maternity: up to 15 weeks for the birthing parent at 55%. Parental: shared between parents, either Standard (40 wks, 55%) or Extended (69 wks, 33%). You pick once and can't switch.",
+        flag: isQC ? "Quebec-specific" : "Federal" },
+      { t: "Find out if your employer has a top-up (SUB plan)",
+        d: "Many employers top EI up to 75–100% of salary for a set number of weeks. This is separate from EI and from job-protected leave. Ask HR for the exact weeks and percentage in writing.", flag: "Ask HR" },
+      { t: "Confirm your job-protected leave length",
+        d: `EI/QPIP pays you; ${provName}'s employment standards protect your job. These are different lengths. Know both dates.`, flag: "Provincial law" },
+      { t: "Apply for EI/QPIP as soon as you stop working",
+        d: "Don't wait. Apply within 4 weeks of your last day or you risk losing benefits. You'll need your Record of Employment (ROE) — your employer files it electronically.", flag: "Time-sensitive" },
+      { t: "Decide Standard vs Extended before you apply",
+        d: "Extended pays less per week but stretches longer. If a top-up only covers a few months, Standard often nets more. Run both through the estimator above." },
+    ],
+    birth: [
+      { t: "Choose your care provider: OB, family doctor, or midwife",
+        d: "Three real options in Canada, each free under provincial health coverage. See the comparison above — it's one of the first and most personal choices you'll make. Decide early; midwife rosters fill fast.", flag: "Big decision" },
+      { t: "Register at a hospital / birth centre near you",
+        d: "Pre-register so admission is fast when labour starts. Tour the unit if offered. Confirm what's covered vs. private-room upgrade costs." },
+      { t: "Book prenatal + breastfeeding classes",
+        d: "Public Health units run free or low-cost prenatal classes, and often breastfeeding sessions — book before the third trimester as spots are limited." },
+      { t: "Line up a pelvic floor physiotherapist",
+        d: "Pelvic floor physio (prenatal and postpartum) is standard care in Canada but rarely auto-referred. Often covered by extended health benefits. Book a postpartum assessment for ~6 weeks after birth now.", flag: "Often forgotten" },
+      { t: "Buy and install an approved car seat",
+        d: "By law you cannot leave the hospital without a properly installed, Canada-approved rear-facing seat. Many fire halls / Public Health offer free install checks.", flag: "Legally required" },
+      { t: "Pack a hospital bag + write a light birth plan",
+        d: "Bag: ID, health card, going-home outfit for baby, comfortable clothes, phone charger. A birth plan is a preferences sheet, not a script — keep it one page and flexible." },
+      { t: "Know what hospital screening to expect",
+        d: "Newborn blood-spot screening and a hearing test happen before discharge automatically. Nothing to book — just know it's coming." },
+    ],
+    newborn: [
+      { t: "Find a paediatrician or family doctor for baby",
+        d: "Line this up before discharge — the first visit is usually within 24–72 hours of going home (weight check + jaundice). A family doctor is fully appropriate.", flag: "Before discharge" },
+      { t: "Know the Canadian immunization schedule",
+        d: "First shots are typically at 2 months, then 4, 6, 12, and 18 months, following your province's publicly funded schedule. Keep your own record (the yellow card)." },
+      { t: "Set up breastfeeding / feeding support",
+        d: "Public Health breastfeeding clinics and lactation consultants (IBCLCs) exist in every region. La Leche League is free. Make the first call in week one." },
+      { t: "Watch developmental milestones (and the 18-month visit)",
+        d: "Track rolling, sitting, babbling, first words. The enhanced 18-month well-baby visit is a key Canadian checkpoint for development and school readiness — book it.", flag: "Canada-specific" },
+      { t: "Screen your own mental health",
+        d: "Postpartum mood and anxiety disorders affect roughly 1 in 5 parents and are very treatable. Ask your provider about screening. Applies to non-birthing partners too.", flag: "Don't skip" },
+    ],
+    paperwork: [
+      { t: isQC ? "Register the birth with Directeur de l'état civil" : "Register the birth (use the bundled online service)",
+        d: isQC ? "In Quebec, birth registration goes through the Directeur de l'état civil. Do this first — everything else depends on it."
+          : `Most provinces (incl. ${provName}) offer a 4-in-1 Newborn Registration Service: register the birth, order the birth certificate, apply for the SIN, AND apply for the Canada Child Benefit in one online form. Use it — it saves weeks.`,
+        flag: isQC ? "Quebec route" : "4-in-1 shortcut" },
+      { t: "Order the birth certificate",
+        d: "The legal document everything else references. If you used the bundle, it's already in motion. You'll need it for the passport." },
+      { t: "Get baby a SIN (Social Insurance Number)",
+        d: "Free. Needed to open an RESP and for the CCB. Included in the newborn bundle in most provinces, otherwise apply through Service Canada." },
+      { t: "Add baby to provincial health coverage",
+        d: `Register for ${provName}'s health card (e.g. OHIP in Ontario, MSP in BC, RAMQ in Quebec) so baby's visits are covered from day one.` },
+      { t: "Apply for a passport (only if travelling)",
+        d: "Child passports are valid 5 years. Requires the birth certificate, photos, and a guarantor. Not urgent unless you have travel planned." },
+      { t: "Confirm the Canada Child Benefit (CCB) is flowing",
+        d: "If you applied via the newborn bundle, no separate step. Otherwise apply through CRA My Account. Tax-free, monthly, on the 20th." },
+    ],
+    future: [
+      { t: "Open an RESP and start the CESG grant",
+        d: "Contribute up to $2,500/yr to capture the 20% Canada Education Savings Grant — free $500/yr, up to $7,200 lifetime per child. Lower-income families get extra CESG + the Canada Learning Bond ($2,000, no contribution needed).", flag: "Free money" },
+      { t: "Pick an RESP provider (avoid lock-in plans)",
+        d: "Self-directed RESPs at the big banks or low-fee brokerages give flexibility. Be cautious with group/scholarship-plan dealers that charge enrolment fees and have rigid rules.", flag: "Watch fees" },
+      { t: "Understand the Canada Child Benefit you're getting",
+        d: "Max for the current period is $7,997/yr per child under 6 (~$666/mo), tax-free, reducing above ~$37,487 family net income. Rises in July 2026. Many provinces add their own benefit on top." },
+      { t: "Write (or update) a will naming a guardian",
+        d: "Without a will, a court decides who raises your child. Naming a guardian is the single most important reason new parents need a will. Online services (Willful, Epilogue) are valid in most provinces.", flag: "Most important" },
+      { t: "Get term life + disability insurance",
+        d: "If someone depends on your income, term life is cheap and essential. Disability insurance protects the more likely risk — your ability to earn. Pair this with the will." },
+      { t: "Check if an RDSP applies",
+        d: "If your child has or develops a disability, the Registered Disability Savings Plan comes with generous matching grants and bonds. Worth knowing it exists." },
+    ],
+    // FIRST FEW DAYS lives in its own custom view (two tracks), not this generic list.
+    firstdays: [],
+  };
+}
+
+/* ---- the first few days: two tracks ---- */
+const BABY_TRACK = [
+  { t: "The 24–72 hour check-up", d: "Before you leave, the hospital schedules baby's first visit within 24 to 72 hours of discharge — a weight check and a jaundice (yellow skin/eyes) look. This is required, not optional. Bring the discharge summary form to it." },
+  { t: "Is feeding working? Count diapers", d: "In the early days the simplest signal that baby is getting enough is output: roughly as many wet diapers per day as days old, building toward 6+ wet and 3+ dirty by day 5–6. Latch help is a phone call away — don't wait." },
+  { t: "Jaundice watch", d: "Mild yellowing is common and usually fine. But yellow that's spreading down to the belly or legs, a baby who's very sleepy and hard to wake, or poor feeding warrants a call to 811 or your provider the same day." },
+  { t: "Safe sleep, every sleep", d: "Alone, on the Back, in a bare Crib (the ABCs). No pillows, bumpers, or loose blankets. Room-sharing without bed-sharing for the first 6 months lowers risk." },
+  { t: "Cord & skin care", d: "Keep the cord stump clean and dry; it falls off in 1–3 weeks. Sponge baths until then. A little dried blood is normal — redness spreading onto the belly skin is not, and means call." },
+  { t: "The public-health nurse will call", d: "In most provinces a public health nurse phones within 2–3 days of discharge to check on you both and can visit. Say yes — it's free, and they're a goldmine for feeding and settling help." },
+];
+
+const YOU_TRACK = [
+  { t: "Bleeding (lochia) — what's normal", d: "Vaginal bleeding for several weeks that gradually fades from red to pink to brown is expected. Soaking a pad an hour, passing clots bigger than a golf ball, or a sudden gush after it had slowed are reasons to call your provider or 811 now." },
+  { t: "Healing down there / C-section site", d: "Stitches, swelling and soreness are normal early on. Use the peri bottle, ice, and rest. Increasing pain, spreading redness, a bad smell, or fever can signal infection — get it checked rather than waiting it out." },
+  { t: "Your body's warning signs", d: "Some symptoms mean don't wait: a severe headache that won't ease, vision changes or seeing spots, sudden swelling of face or hands, chest pain or trouble breathing, calf pain or swelling, or a fever. These can be signs of serious postpartum conditions. Call 811, your provider, or go to emergency." },
+  { t: "Engorgement & sore nipples", d: "Around day 3–5 your milk 'comes in' and breasts can feel rock-hard. Frequent feeding, warmth before and cold after, and hand-expression help. Cracked or bleeding nipples usually mean a latch fix — book a lactation consultant." },
+  { t: "Baby blues vs. something more", d: "Weepy, up-and-down emotions in the first two weeks are extremely common ('baby blues'). If low mood, anxiety, or hopelessness lasts beyond two weeks or feels heavy, that's postpartum depression/anxiety — very treatable. Reach out to your provider. Applies to partners too." },
+  { t: "Rest, food, and let people help", d: "Recovery is real recovery. Sleep when you can, eat and drink steadily, and accept every offer of a meal or a load of laundry. Doing too much too soon slows healing." },
+];
+
+const PROVIDERS = [
+  { name: "Midwife", color: C.olive, who: "Healthy, lower-risk pregnancies",
+    pts: ["Publicly funded — free", "Hospital, birth-centre, or home birth", "Continuity: same small team throughout", "Home visits + several appointments in week one", "Will transfer care to an OB if complications arise"] },
+  { name: "Obstetrician (OB)", color: C.plum, who: "Higher-risk or complex pregnancies",
+    pts: ["Publicly funded — free (referral usually needed)", "Hospital birth", "Surgical training (C-sections)", "May rotate within a practice group", "Six-week postpartum check-up booked separately"] },
+  { name: "Family doctor", color: C.clay, who: "Lower-risk, if yours does deliveries",
+    pts: ["Publicly funded — free", "Hospital birth", "Already knows your history", "Fewer family docs still do deliveries", "Can continue as baby's doctor too"] },
+];
+
+const CLINIC_CRITERIA = [
+  "Success rates published transparently (and by age group, not just headline numbers)",
+  "Clear, upfront pricing — ask for an all-in cost estimate, not just the cycle fee",
+  "Whether they're approved under your province's funded program",
+  "Wait time for a first consult and to start treatment",
+  "On-site IVF lab vs. sending samples elsewhere",
+  "How they handle the emotional side — counselling, a named care team",
+  "Inclusive of your family structure (LGBTQ2S+, single-parent)",
+];
+
+// Twig has physical clinics in ON (Toronto) and BC (Vancouver) only.
+const TWIG_PROVINCES = ["ON", "BC"];
+const EDITOR_PICK = {
+  name: "Twig Fertility",
+  url: "https://twigfertility.com",
+  whyBase: "A modern, patient-centred clinic with transparent pricing, a dedicated care team, an on-site IVF lab, and an explicitly trans-affirming, inclusive space.",
+  cityNote: {
+    ON: "Clinics in Toronto (Midtown & Downtown), and an approved Ontario Fertility Program provider.",
+    BC: "Clinic in Vancouver.",
+  },
+};
+
+const FONT_DISPLAY = "'Fraunces', Georgia, serif";
+const FONT_BODY = "'Outfit', system-ui, sans-serif";
+
+export default function InisfreeParent() {
+  const [province, setProvince] = useState("");
+  const [stage, setStage] = useState("");
+  const [activePillar, setActivePillar] = useState(null);
+  const [done, setDone] = useState({});
+  const [openItem, setOpenItem] = useState(null);
+  const [salary, setSalary] = useState(72000);
+  const [option, setOption] = useState("std");
+  const [topupPct, setTopupPct] = useState(0);
+  const [topupWeeks, setTopupWeeks] = useState(0);
+
+  const checklist = useMemo(() => buildChecklist(province), [province]);
+
+  // smart surfacing: lead with the most relevant pillar for the stage
+  const leadPillarId = stage === "newborn" ? "firstdays" : stage === "trying" ? "trying" : null;
+  const orderedPillars = useMemo(() => {
+    if (leadPillarId) {
+      const lead = PILLARS.find((p) => p.id === leadPillarId);
+      return [lead, ...PILLARS.filter((p) => p.id !== leadPillarId)];
+    }
+    return PILLARS;
+  }, [leadPillarId]);
+
+  const est = useMemo(() => {
+    const weekly = salary / 52;
+    const insurable = Math.min(weekly, EI.mie / 52);
+    const eiRate = option === "std" ? EI.rate : EI.extRate;
+    const cap = option === "std" ? EI.maxStd : EI.maxExt;
+    const eiWeekly = Math.min(insurable * eiRate, cap);
+    const totalWeeks = 15 + (option === "std" ? 35 : 61);
+    const duringTopup = Math.max(eiWeekly, Math.min((salary / 52) * (topupPct / 100), salary / 52));
+    const topupBonus = topupPct > 0 ? Math.max(0, duringTopup - eiWeekly) * topupWeeks : 0;
+    const eiTotal = eiWeekly * totalWeeks;
+    return { eiWeekly: Math.round(eiWeekly), totalWeeks, eiTotal: Math.round(eiTotal),
+      topupBonus: Math.round(topupBonus), grand: Math.round(eiTotal + topupBonus) };
+  }, [salary, option, topupPct, topupWeeks]);
+
+  const toggle = (key) => setDone((d) => ({ ...d, [key]: !d[key] }));
+  const pillarProgress = (pid) => {
+    if (pid === "firstdays") {
+      const items = [...BABY_TRACK, ...YOU_TRACK];
+      return { c: items.filter((_, i) => done[`firstdays-${i}`]).length, total: items.length };
+    }
+    const items = checklist[pid] || [];
+    return { c: items.filter((_, i) => done[`${pid}-${i}`]).length, total: items.length };
+  };
+  const started = province && stage;
+
+  return (
+    <div style={{ fontFamily: FONT_BODY, background: C.cream, minHeight: "100vh", color: C.ink }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap');
+        * { box-sizing: border-box; }
+        .if-card { transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+        .if-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -18px rgba(122,74,82,.30); }
+        .if-tap { cursor: pointer; } .if-tap:active { transform: scale(.985); }
+        .if-fade { animation: ifFade .5s both; }
+        @keyframes ifFade { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+        .if-pill-btn { transition: all .2s; } .if-pill-btn:hover { background:#fff; }
+        input[type=range]{ -webkit-appearance:none; height:6px; border-radius:99px; background:${C.blush}; outline:none;}
+        input[type=range]::-webkit-slider-thumb{ -webkit-appearance:none; width:22px; height:22px; border-radius:50%; background:${C.plum}; cursor:pointer; border:3px solid #fff; box-shadow:0 2px 6px rgba(0,0,0,.18);}
+        .if-grain { background-image: radial-gradient(rgba(122,74,82,.045) 1px, transparent 1px); background-size: 4px 4px; }
+      `}</style>
+
+      <header style={{ position: "sticky", top: 0, zIndex: 40, background: "rgba(251,244,241,.85)", backdropFilter: "blur(10px)", borderBottom: `1px solid ${C.line}` }}>
+        <div style={{ maxWidth: 1100, margin: "0 auto", padding: "16px 24px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 13, background: C.plum, display: "grid", placeItems: "center", boxShadow: `0 4px 14px -4px ${C.plum}99` }}>
+              <Protea size={22} color="#fff" />
+            </div>
+            <div>
+              <div style={{ fontFamily: FONT_DISPLAY, fontSize: 21, fontWeight: 600, lineHeight: 1, color: C.ink }}>The Inisfree Collective</div>
+              <div style={{ fontSize: 10.5, letterSpacing: ".1em", textTransform: "uppercase", color: C.inkFaint, marginTop: 2 }}>The Canadian parent OS</div>
+            </div>
+          </div>
+          {started && (
+            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: C.inkSoft }}>
+              <MapPin size={15} /> {PROVINCES.find((p) => p.code === province)?.name}
+              <button onClick={() => { setProvince(""); setStage(""); setActivePillar(null); }}
+                style={{ marginLeft: 8, fontSize: 12, color: C.plum, background: "none", border: "none", cursor: "pointer", textDecoration: "underline" }}>change</button>
+            </div>
+          )}
+        </div>
+      </header>
+
+      {!started && (
+        <section className="if-grain" style={{ maxWidth: 760, margin: "0 auto", padding: "64px 24px 80px" }}>
+          <div className="if-fade">
+            <p style={{ color: C.plum, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", fontSize: 12, marginBottom: 16 }}>For expectant & new parents in Canada</p>
+            <h1 style={{ fontFamily: FONT_DISPLAY, fontSize: "clamp(34px, 6vw, 56px)", lineHeight: 1.05, fontWeight: 600, margin: "0 0 20px", color: C.ink }}>
+              Every confusing, Canada-specific thing about having a baby — in one calm checklist.
+            </h1>
+            <p style={{ fontSize: 18, lineHeight: 1.6, color: C.inkSoft, maxWidth: 560 }}>
+              EI and your top-up. Finding a midwife, a hospital, a pelvic floor physio. The first few days with a newborn — and recovering yourself. Birth certificate → SIN → health card → CCB in the right order. RESP, the Canada Child Benefit, a will. Tailored to your province.
+            </p>
+          </div>
+
+          <div className="if-fade" style={{ animationDelay: ".1s", marginTop: 48 }}>
+            <label style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 600, display: "block", marginBottom: 14 }}>First — where in Canada are you?</label>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(140px,1fr))", gap: 10 }}>
+              {PROVINCES.map((p) => (
+                <button key={p.code} onClick={() => setProvince(p.code)} className="if-pill-btn if-tap"
+                  style={{ padding: "12px 14px", borderRadius: 12, textAlign: "left", cursor: "pointer",
+                    border: province === p.code ? `2px solid ${C.plum}` : `1px solid ${C.line}`,
+                    background: province === p.code ? "#fff" : "transparent",
+                    fontWeight: province === p.code ? 600 : 400, fontSize: 14, color: C.ink }}>{p.name}</button>
+              ))}
+            </div>
+          </div>
+
+          {province && (
+            <div className="if-fade" style={{ marginTop: 44 }}>
+              <label style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 600, display: "block", marginBottom: 14 }}>And where are you in the journey?</label>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 12 }}>
+                {STAGES.map((s) => {
+                  const Ic = s.icon;
+                  return (
+                    <button key={s.id} onClick={() => setStage(s.id)} className="if-card if-tap"
+                      style={{ padding: "20px 18px", borderRadius: 16, textAlign: "left", cursor: "pointer",
+                        border: stage === s.id ? `2px solid ${C.plum}` : `1px solid ${C.line}`, background: C.creamCard }}>
+                      <Ic size={26} color={C.plum} strokeWidth={1.8} />
+                      <div style={{ fontFamily: FONT_DISPLAY, fontSize: 18, fontWeight: 600, marginTop: 10 }}>{s.label}</div>
+                      <div style={{ fontSize: 13, color: C.inkFaint }}>{s.sub}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {province && stage && (
+            <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} className="if-tap if-fade"
+              style={{ marginTop: 36, background: C.plum, color: "#fff", border: "none", padding: "16px 28px", borderRadius: 99, fontSize: 16, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 8, fontFamily: FONT_BODY }}>
+              Build my plan <ChevronRight size={18} />
+            </button>
+          )}
+        </section>
+      )}
+
+      {started && (
+        <main style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px 100px" }}>
+          {!activePillar && (
+            <>
+              <div className="if-fade">
+                <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: "clamp(26px,4vw,38px)", fontWeight: 600, margin: "0 0 6px" }}>
+                  Your plan, {STAGES.find((s) => s.id === stage)?.label.toLowerCase()}.
+                </h2>
+                <p style={{ color: C.inkSoft, fontSize: 16, maxWidth: 620 }}>
+                  {stage === "newborn"
+                    ? "The first few days come first — caring for baby and for you. Everything else is below."
+                    : stage === "trying"
+                    ? "Start before you start — pre-conception checks, clinics, and funding. The rest of the journey is here when you need it."
+                    : "Pillars from leave paperwork to your child's future."} Tap any one to open its Canada-specific, {PROVINCES.find((p) => p.code === province)?.name}-aware checklist.
+                </p>
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 18, marginTop: 32 }}>
+                {orderedPillars.map((p, idx) => {
+                  const Ic = p.icon;
+                  const prog = pillarProgress(p.id);
+                  const lead = leadPillarId && p.id === leadPillarId;
+                  return (
+                    <button key={p.id} onClick={() => { setActivePillar(p.id); setOpenItem(null); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                      className="if-card if-tap if-fade"
+                      style={{ animationDelay: `${idx * 0.06}s`, padding: 24, borderRadius: 20, textAlign: "left", cursor: "pointer",
+                        background: C.creamCard, border: lead ? `2px solid ${p.accent}` : `1px solid ${C.line}`, position: "relative", overflow: "hidden" }}>
+                      <div style={{ position: "absolute", top: -20, right: -20, width: 90, height: 90, borderRadius: "50%", background: p.accent, opacity: .09 }} />
+                      {lead && <span style={{ position: "absolute", top: 16, right: 16, fontSize: 10.5, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase", color: p.accent, background: `${p.accent}1f`, padding: "3px 8px", borderRadius: 99 }}>Start here</span>}
+                      <div style={{ width: 48, height: 48, borderRadius: 14, background: `${p.accent}1f`, display: "grid", placeItems: "center", marginBottom: 16 }}>
+                        <Ic size={26} color={p.accent} strokeWidth={1.9} />
+                      </div>
+                      <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 21, fontWeight: 600, margin: "0 0 6px" }}>{p.title}</h3>
+                      <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.5, margin: "0 0 18px" }}>{p.blurb}</p>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <div style={{ flex: 1, height: 6, background: C.blush, borderRadius: 99, marginRight: 12, overflow: "hidden" }}>
+                          <div style={{ width: `${(prog.c / prog.total) * 100}%`, height: "100%", background: p.accent, borderRadius: 99, transition: "width .4s" }} />
+                        </div>
+                        <span style={{ fontSize: 12, color: C.inkFaint, whiteSpace: "nowrap" }}>{prog.c}/{prog.total}</span>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                <div className="if-card if-fade" style={{ animationDelay: ".36s", padding: 24, borderRadius: 20, background: C.ink, color: C.cream, border: `1px solid ${C.ink}` }}>
+                  <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(251,244,241,.12)", display: "grid", placeItems: "center", marginBottom: 16 }}>
+                    <Search size={26} color={C.blush} strokeWidth={1.9} />
+                  </div>
+                  <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 21, fontWeight: 600, margin: "0 0 6px" }}>Find it near you</h3>
+                  <p style={{ fontSize: 14, color: "#D8C2C4", lineHeight: 1.5, margin: 0 }}>
+                    Hospitals, midwife clinics, pelvic floor physio, prenatal classes, paediatricians and childcare waitlists — searchable by postal code.
+                  </p>
+                  <div style={{ marginTop: 16, display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: C.blush }}>
+                    Mockup — would plug into Google Places <ChevronRight size={15} />
+                  </div>
+                </div>
+              </div>
+
+              <div className="if-fade" style={{ marginTop: 28, background: C.blush, border: `1px solid ${C.line}`, borderRadius: 18, padding: "20px 24px", display: "flex", gap: 16, alignItems: "flex-start" }}>
+                <AlertCircle size={22} color={C.plum} style={{ flexShrink: 0, marginTop: 2 }} />
+                <div>
+                  <div style={{ fontFamily: FONT_DISPLAY, fontWeight: 600, fontSize: 17, color: C.ink }}>Get on childcare waitlists now — even while pregnant.</div>
+                  <p style={{ fontSize: 14, color: C.inkSoft, margin: "4px 0 0", lineHeight: 1.5 }}>
+                    Licensed spots (especially infant rooms) routinely have 12–24 month waits. With $10/day care (CWELCC) rolling out, demand is even higher. Join 4–6 lists today; you can always decline later.
+                  </p>
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* generic checklist pillars */}
+          {activePillar && !["money", "firstdays", "birth", "trying"].includes(activePillar) && (
+            <PillarDetail pillar={PILLARS.find((p) => p.id === activePillar)} items={checklist[activePillar]}
+              done={done} toggle={toggle} openItem={openItem} setOpenItem={setOpenItem} back={() => setActivePillar(null)} />
+          )}
+
+          {/* trying: clinic guidance on top, then checklist */}
+          {activePillar === "trying" && (
+            <div>
+              <BackBtn back={() => setActivePillar(null)} />
+              <div className="if-fade" style={{ marginBottom: 28 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+                  <div style={{ width: 52, height: 52, borderRadius: 15, background: `${C.sage}1f`, display: "grid", placeItems: "center" }}>
+                    <Sprout size={28} color={C.sage} strokeWidth={1.9} />
+                  </div>
+                  <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 30, fontWeight: 600, margin: 0 }}>Before You Try</h2>
+                </div>
+
+                {/* Editor's pick — Twig, only where it has clinics */}
+                {TWIG_PROVINCES.includes(province) ? (
+                  <div className="if-card" style={{ background: C.creamCard, border: `1px solid ${C.line}`, borderTop: `4px solid ${C.sage}`, borderRadius: 16, padding: "20px 22px", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <Star size={16} color={C.terracotta} fill={C.terracotta} />
+                      <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: C.terracotta }}>Editor's pick</span>
+                    </div>
+                    <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 22, fontWeight: 600, margin: "0 0 6px" }}>{EDITOR_PICK.name}</h3>
+                    <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55, margin: "0 0 14px" }}>
+                      {EDITOR_PICK.whyBase} {EDITOR_PICK.cityNote[province]}
+                    </p>
+                    <a href={EDITOR_PICK.url} target="_blank" rel="noopener noreferrer"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13.5, fontWeight: 600, color: C.plum, textDecoration: "none", borderBottom: `1.5px solid ${C.plum}55`, paddingBottom: 1 }}>
+                      Visit twigfertility.com <ChevronRight size={15} />
+                    </a>
+                    <p style={{ fontSize: 11.5, color: C.inkFaint, margin: "14px 0 0", lineHeight: 1.5, fontStyle: "italic" }}>
+                      A genuine recommendation, not a paid placement — and one clinic among many. Use the checklist below to compare any clinic against what matters to you.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="if-card" style={{ background: C.creamCard, border: `1px solid ${C.line}`, borderTop: `4px solid ${C.sage}`, borderRadius: 16, padding: "20px 22px", marginBottom: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                      <Search size={16} color={C.olive} />
+                      <span style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: ".06em", textTransform: "uppercase", color: C.olive }}>Find a clinic near you</span>
+                    </div>
+                    <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 20, fontWeight: 600, margin: "0 0 6px" }}>Fertility clinics in {PROVINCES.find((p) => p.code === province)?.name}</h3>
+                    <p style={{ fontSize: 14, color: C.inkSoft, lineHeight: 1.55, margin: 0 }}>
+                      We don't feature a single pick in your province yet. Most provinces have several accredited clinics — use the checklist below to compare them, and ask your family doctor for a referral to start.
+                    </p>
+                  </div>
+                )}
+
+                {/* How to choose any clinic */}
+                <div style={{ background: `${C.sage}14`, border: `1px solid ${C.sage}40`, borderRadius: 16, padding: "18px 22px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                    <Check size={18} color={C.olive} strokeWidth={2.4} />
+                    <span style={{ fontFamily: FONT_DISPLAY, fontWeight: 600, fontSize: 16 }}>How to choose a fertility clinic</span>
+                  </div>
+                  <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 8 }}>
+                    {CLINIC_CRITERIA.map((x, i) => (
+                      <li key={i} style={{ fontSize: 13.5, color: C.inkSoft, lineHeight: 1.45, display: "flex", gap: 9 }}>
+                        <span style={{ color: C.olive, fontWeight: 700, flexShrink: 0 }}>·</span> {x}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              <PillarDetail pillar={PILLARS.find((p) => p.id === "trying")} items={checklist.trying}
+                done={done} toggle={toggle} openItem={openItem} setOpenItem={setOpenItem} noBack />
+            </div>
+          )}
+
+
+          {/* birth: provider comparison on top, then checklist */}
+          {activePillar === "birth" && (
+            <div>
+              <BackBtn back={() => setActivePillar(null)} />
+              <div className="if-fade" style={{ marginBottom: 28 }}>
+                <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 600, margin: "0 0 4px" }}>Who will care for you through pregnancy & birth?</h2>
+                <p style={{ color: C.inkSoft, fontSize: 14, margin: "0 0 18px" }}>All three are covered by provincial health insurance in Canada. The right fit depends on your risk level and how you want to give birth.</p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 14 }}>
+                  {PROVIDERS.map((pr) => (
+                    <div key={pr.name} className="if-card" style={{ background: C.creamCard, border: `1px solid ${C.line}`, borderTop: `4px solid ${pr.color}`, borderRadius: 16, padding: 20 }}>
+                      <h3 style={{ fontFamily: FONT_DISPLAY, fontSize: 19, fontWeight: 600, margin: "0 0 2px" }}>{pr.name}</h3>
+                      <div style={{ fontSize: 12.5, color: pr.color, fontWeight: 600, marginBottom: 12 }}>Best for: {pr.who}</div>
+                      <ul style={{ margin: 0, padding: 0, listStyle: "none", display: "flex", flexDirection: "column", gap: 7 }}>
+                        {pr.pts.map((x, i) => (
+                          <li key={i} style={{ fontSize: 13, color: C.inkSoft, lineHeight: 1.4, display: "flex", gap: 8 }}>
+                            <span style={{ color: pr.color, fontWeight: 700 }}>·</span> {x}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <PillarDetail pillar={PILLARS.find((p) => p.id === "birth")} items={checklist.birth}
+                done={done} toggle={toggle} openItem={openItem} setOpenItem={setOpenItem} noBack />
+            </div>
+          )}
+
+          {/* first few days: two-track custom view */}
+          {activePillar === "firstdays" && (
+            <FirstDays back={() => setActivePillar(null)} done={done} toggle={toggle} openItem={openItem} setOpenItem={setOpenItem} />
+          )}
+
+          {/* money: estimator + checklist */}
+          {activePillar === "money" && (
+            <div>
+              <BackBtn back={() => setActivePillar(null)} />
+              <div className="if-fade" style={{ background: C.creamCard, border: `1px solid ${C.line}`, borderRadius: 22, padding: "28px 28px 32px", marginBottom: 28 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                  <CircleDollarSign size={24} color={C.plum} />
+                  <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 26, fontWeight: 600, margin: 0 }}>What will actually land in your account?</h2>
+                </div>
+                <p style={{ color: C.inkSoft, fontSize: 14, margin: "0 0 24px" }}>
+                  A rough estimate using 2026 EI maximums. {province === "QC" && "Quebec uses QPIP — treat this as directional only. "}Not financial advice; Service Canada determines actual benefits.
+                </p>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 24 }}>
+                  <div>
+                    <SliderRow label="Your annual salary (before tax)" value={`$${salary.toLocaleString()}`} />
+                    <input type="range" min={20000} max={150000} step={1000} value={salary} onChange={(e) => setSalary(+e.target.value)} style={{ width: "100%" }} />
+                    <div style={{ marginTop: 24, marginBottom: 8, fontSize: 14, fontWeight: 600 }}>Parental benefit option</div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      {[["std", "Standard · 55%"], ["ext", "Extended · 33%"]].map(([v, l]) => (
+                        <button key={v} onClick={() => setOption(v)} className="if-tap"
+                          style={{ flex: 1, padding: "10px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer",
+                            border: option === v ? `2px solid ${C.plum}` : `1px solid ${C.line}`,
+                            background: option === v ? C.blush : "transparent", color: C.ink }}>{l}</button>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 24 }}>
+                      <SliderRow label="Employer top-up (% of salary)" value={`${topupPct}%`} />
+                      <input type="range" min={0} max={100} step={5} value={topupPct} onChange={(e) => setTopupPct(+e.target.value)} style={{ width: "100%" }} />
+                    </div>
+                    <div style={{ marginTop: 18 }}>
+                      <SliderRow label="Top-up duration (weeks)" value={`${topupWeeks} wk`} />
+                      <input type="range" min={0} max={26} step={1} value={topupWeeks} onChange={(e) => setTopupWeeks(+e.target.value)} style={{ width: "100%" }} />
+                    </div>
+                  </div>
+                  <div style={{ background: C.ink, borderRadius: 18, padding: 24, color: C.cream, alignSelf: "start" }}>
+                    <div style={{ fontSize: 13, color: "#D8C2C4", textTransform: "uppercase", letterSpacing: ".08em" }}>Estimated EI / week</div>
+                    <div style={{ fontFamily: FONT_DISPLAY, fontSize: 40, fontWeight: 600, lineHeight: 1.1 }}>${est.eiWeekly}</div>
+                    <div style={{ fontSize: 12, color: C.inkFaint, marginBottom: 18 }}>capped at ${option === "std" ? EI.maxStd : EI.maxExt}/wk in 2026</div>
+                    <Row k="Covered weeks (mat + parental)" v={`${est.totalWeeks} wk`} />
+                    <Row k="EI over full leave" v={`$${est.eiTotal.toLocaleString()}`} />
+                    {topupPct > 0 && topupWeeks > 0 && <Row k={`Employer top-up bonus (${topupWeeks} wk)`} v={`+$${est.topupBonus.toLocaleString()}`} hi />}
+                    <div style={{ borderTop: "1px solid rgba(251,244,241,.18)", margin: "14px 0" }} />
+                    <Row k="Estimated total before tax" v={`$${est.grand.toLocaleString()}`} big />
+                    <p style={{ fontSize: 11, color: C.inkFaint, marginTop: 14, lineHeight: 1.5 }}>
+                      EI is taxable — income tax is withheld. Low-income families may get the Family Supplement (up to 80%). Estimate ignores week-by-week top-up overlap nuances.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <PillarDetail pillar={PILLARS.find((p) => p.id === "money")} items={checklist.money}
+                done={done} toggle={toggle} openItem={openItem} setOpenItem={setOpenItem} noBack />
+            </div>
+          )}
+        </main>
+      )}
+
+      <footer style={{ borderTop: `1px solid ${C.line}`, padding: "28px 24px", textAlign: "center", color: C.inkFaint, fontSize: 12.5 }}>
+        Prototype · Health content is general information, not medical advice — when in doubt, call 811 or your provider. Figures verified for 2026.
+      </footer>
+    </div>
+  );
+}
+
+function BackBtn({ back }) {
+  return (
+    <button onClick={() => { back(); window.scrollTo({ top: 0, behavior: "smooth" }); }} className="if-tap"
+      style={{ background: "none", border: "none", color: C.plum, fontSize: 14, fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", gap: 4, marginBottom: 20, fontFamily: FONT_BODY }}>
+      <ChevronRight size={16} style={{ transform: "rotate(180deg)" }} /> All pillars
+    </button>
+  );
+}
+
+function FirstDays({ back, done, toggle, openItem, setOpenItem }) {
+  const [track, setTrack] = useState("baby");
+  const items = track === "baby" ? BABY_TRACK : YOU_TRACK;
+  const offset = track === "baby" ? 0 : BABY_TRACK.length;
+  return (
+    <div className="if-fade">
+      <BackBtn back={back} />
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+        <div style={{ width: 52, height: 52, borderRadius: 15, background: `${C.dusk}1f`, display: "grid", placeItems: "center" }}>
+          <Sun size={28} color={C.dusk} strokeWidth={1.9} />
+        </div>
+        <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 30, fontWeight: 600, margin: 0 }}>The First Few Days</h2>
+      </div>
+
+      {/* 811 callout */}
+      <div style={{ background: C.dusk, color: C.cream, borderRadius: 16, padding: "16px 20px", display: "flex", gap: 14, alignItems: "center", marginBottom: 22 }}>
+        <Phone size={22} style={{ flexShrink: 0 }} />
+        <div style={{ fontSize: 14, lineHeight: 1.45 }}>
+          <strong style={{ fontFamily: FONT_DISPLAY }}>Not sure if something's normal? Call 811.</strong> A registered nurse, free, day or night, in most provinces. For anything severe or frightening, go to emergency or call 911.
+        </div>
+      </div>
+
+      {/* track toggle */}
+      <div style={{ display: "flex", gap: 8, marginBottom: 20 }}>
+        {[["baby", "For baby", Baby], ["you", "For you (recovering)", HeartPulse]].map(([v, l, Ic]) => (
+          <button key={v} onClick={() => setTrack(v)} className="if-tap"
+            style={{ flex: 1, padding: "12px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              border: track === v ? `2px solid ${C.dusk}` : `1px solid ${C.line}`,
+              background: track === v ? `${C.dusk}14` : C.creamCard, color: C.ink, fontFamily: FONT_BODY }}>
+            <Ic size={18} color={C.dusk} /> {l}
+          </button>
+        ))}
+      </div>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {items.map((item, i) => {
+          const key = `firstdays-${offset + i}`;
+          const isDone = done[key];
+          const isOpen = openItem === key;
+          return (
+            <div key={key} className="if-card" style={{ background: C.creamCard, border: `1px solid ${isOpen ? C.dusk + "66" : C.line}`, borderRadius: 16, overflow: "hidden" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 20px" }}>
+                <button onClick={() => toggle(key)} className="if-tap"
+                  style={{ flexShrink: 0, marginTop: 1, width: 26, height: 26, borderRadius: 8, cursor: "pointer",
+                    border: isDone ? "none" : `2px solid ${C.blush}`, background: isDone ? C.dusk : "transparent", display: "grid", placeItems: "center" }}>
+                  {isDone && <Check size={16} color="#fff" strokeWidth={3} />}
+                </button>
+                <div style={{ flex: 1, cursor: "pointer" }} onClick={() => setOpenItem(isOpen ? null : key)}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span style={{ fontSize: 16, fontWeight: 600, color: isDone ? C.inkFaint : C.ink, textDecoration: isDone ? "line-through" : "none", lineHeight: 1.3 }}>{item.t}</span>
+                    {isOpen ? <ChevronDown size={18} color={C.inkFaint} style={{ flexShrink: 0 }} /> : <ChevronRight size={18} color={C.inkFaint} style={{ flexShrink: 0 }} />}
+                  </div>
+                  {isOpen && <p className="if-fade" style={{ fontSize: 14.5, color: C.inkSoft, lineHeight: 1.6, margin: "12px 0 2px" }}>{item.d}</p>}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function PillarDetail({ pillar, items, done, toggle, openItem, setOpenItem, back, noBack }) {
+  const Ic = pillar.icon;
+  return (
+    <div className="if-fade">
+      {!noBack && <BackBtn back={back} />}
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24 }}>
+        <div style={{ width: 52, height: 52, borderRadius: 15, background: `${pillar.accent}1f`, display: "grid", placeItems: "center" }}>
+          <Ic size={28} color={pillar.accent} strokeWidth={1.9} />
+        </div>
+        <h2 style={{ fontFamily: FONT_DISPLAY, fontSize: 30, fontWeight: 600, margin: 0 }}>{pillar.title}</h2>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {items.map((item, i) => {
+          const key = `${pillar.id}-${i}`;
+          const isDone = done[key];
+          const isOpen = openItem === key;
+          return (
+            <div key={key} className="if-card" style={{ background: C.creamCard, border: `1px solid ${isOpen ? pillar.accent + "66" : C.line}`, borderRadius: 16, overflow: "hidden" }}>
+              <div style={{ display: "flex", alignItems: "flex-start", gap: 14, padding: "18px 20px" }}>
+                <button onClick={() => toggle(key)} className="if-tap"
+                  style={{ flexShrink: 0, marginTop: 1, width: 26, height: 26, borderRadius: 8, cursor: "pointer",
+                    border: isDone ? "none" : `2px solid ${C.blush}`, background: isDone ? pillar.accent : "transparent", display: "grid", placeItems: "center" }}>
+                  {isDone && <Check size={16} color="#fff" strokeWidth={3} />}
+                </button>
+                <div style={{ flex: 1, cursor: "pointer" }} onClick={() => setOpenItem(isOpen ? null : key)}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                    <span style={{ fontSize: 16, fontWeight: 600, color: isDone ? C.inkFaint : C.ink, textDecoration: isDone ? "line-through" : "none", lineHeight: 1.3 }}>{item.t}</span>
+                    {isOpen ? <ChevronDown size={18} color={C.inkFaint} style={{ flexShrink: 0 }} /> : <ChevronRight size={18} color={C.inkFaint} style={{ flexShrink: 0 }} />}
+                  </div>
+                  {item.flag && (
+                    <span style={{ display: "inline-block", marginTop: 8, fontSize: 11, fontWeight: 600, letterSpacing: ".03em", color: pillar.accent, background: `${pillar.accent}1f`, padding: "3px 9px", borderRadius: 99 }}>{item.flag}</span>
+                  )}
+                  {isOpen && <p className="if-fade" style={{ fontSize: 14.5, color: C.inkSoft, lineHeight: 1.6, margin: "12px 0 2px" }}>{item.d}</p>}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function Row({ k, v, hi, big }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", padding: "5px 0" }}>
+      <span style={{ fontSize: big ? 14 : 13, color: hi ? C.blush : "#D8C2C4" }}>{k}</span>
+      <span style={{ fontFamily: FONT_DISPLAY, fontWeight: 600, fontSize: big ? 24 : 16, color: hi ? C.blush : "#fff" }}>{v}</span>
+    </div>
+  );
+}
+
+function SliderRow({ label, value }) {
+  return (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 8 }}>
+      <span style={{ fontSize: 14, fontWeight: 600 }}>{label}</span>
+      <span style={{ fontFamily: FONT_DISPLAY, fontWeight: 600, fontSize: 17, color: C.plum }}>{value}</span>
+    </div>
+  );
+}
