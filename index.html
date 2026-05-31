@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Inisfree Collective — Canadian Parent OS</title>
+<meta name="description" content="Every confusing, Canada-specific thing about having a baby — in one calm checklist." />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blush: #EDD5D5; --cream: #FBF4F1; --cream-card: #FFFBF9;
+    --ink: #33292B; --ink-soft: #6B5559; --ink-faint: #A98E92;
+    --plum: #7A4A52; --sage: #9CA88E; --terracotta: #C77F5E;
+    --rose: #B56B72; --olive: #7D8A66; --clay: #A86A4F;
+    --dusk: #8C6A78; --line: #E8D6D6;
+    --font-display: 'Fraunces', Georgia, serif;
+    --font-body: 'Outfit', system-ui, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; }
+  body {
+    font-family: var(--font-body); background: var(--cream);
+    color: var(--ink); min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: var(--plum); }
+  button { font-family: var(--font-body); cursor: pointer; }
+
+  /* HEADER */
+  header.site {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(251,244,241,.85);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .header-inner {
+    max-width: 1100px; margin: 0 auto; padding: 16px 24px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .brand { display: flex; align-items: center; gap: 11px; }
+  .brand-mark {
+    width: 40px; height: 40px; border-radius: 13px;
+    background: var(--plum); display: grid; place-items: center;
+    box-shadow: 0 4px 14px -4px rgba(122,74,82,.6);
+    flex-shrink: 0;
+  }
+  .brand-name { font-family: var(--font-display); font-size: 21px; font-weight: 600; line-height: 1; }
+  .brand-sub { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); margin-top: 2px; }
+  .header-prov { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--ink-soft); }
+  .header-prov button {
+    margin-left: 8px; font-size: 12px; color: var(--plum);
+    background: none; border: none; text-decoration: underline;
+  }
+
+  /* CONTAINERS */
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 24px 100px; }
+  section.onboarding { max-width: 760px; margin: 0 auto; padding: 64px 24px 80px;
+    background-image: radial-gradient(rgba(122,74,82,.045) 1px, transparent 1px);
+    background-size: 4px 4px;
+  }
+
+  /* TYPOGRAPHY */
+  h1.hero {
+    font-family: var(--font-display);
+    font-size: clamp(34px, 6vw, 56px);
+    line-height: 1.05; font-weight: 600; margin: 0 0 20px;
+  }
+  .eyebrow { color: var(--plum); font-weight: 600; letter-spacing: .1em;
+    text-transform: uppercase; font-size: 12px; margin-bottom: 16px; }
+  p.lede { font-size: 18px; line-height: 1.6; color: var(--ink-soft); max-width: 560px; }
+  label.qlabel { font-family: var(--font-display); font-size: 20px; font-weight: 600;
+    display: block; margin-bottom: 14px; margin-top: 44px; }
+
+  /* GRIDS */
+  .prov-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px,1fr)); gap: 10px; }
+  .stage-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 12px; }
+  .pillar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 18px; margin-top: 32px; }
+  .provider-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px,1fr)); gap: 14px; }
+  .money-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 24px; }
+
+  /* BUTTONS */
+  .opt-btn {
+    padding: 12px 14px; border-radius: 12px; text-align: left;
+    border: 1px solid var(--line); background: transparent;
+    font-size: 14px; color: var(--ink); transition: all .2s;
+  }
+  .opt-btn:hover { background: #fff; }
+  .opt-btn.selected { border: 2px solid var(--plum); background: #fff; font-weight: 600; }
+  .stage-btn {
+    padding: 20px 18px; border-radius: 16px; text-align: left;
+    border: 1px solid var(--line); background: var(--cream-card);
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+  }
+  .stage-btn:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -18px rgba(122,74,82,.30); }
+  .stage-btn.selected { border: 2px solid var(--plum); }
+  .stage-btn-title { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin-top: 10px; }
+  .stage-btn-sub { font-size: 13px; color: var(--ink-faint); }
+
+  .cta {
+    margin-top: 36px; background: var(--plum); color: #fff;
+    border: none; padding: 16px 28px; border-radius: 99px;
+    font-size: 16px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .cta[disabled] { opacity: .4; cursor: not-allowed; }
+
+  /* CARDS */
+  .card {
+    background: var(--cream-card); border: 1px solid var(--line);
+    border-radius: 20px; padding: 24px; text-align: left;
+    position: relative; overflow: hidden;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -18px rgba(122,74,82,.30); }
+  .pillar-card { cursor: pointer; border: 1px solid var(--line); }
+  .pillar-card.lead { border: 2px solid currentColor; }
+  .pillar-blob { position: absolute; top: -20px; right: -20px; width: 90px; height: 90px;
+    border-radius: 50%; opacity: .09; }
+  .pillar-icon-wrap { width: 48px; height: 48px; border-radius: 14px;
+    display: grid; place-items: center; margin-bottom: 16px; }
+  .pillar-title { font-family: var(--font-display); font-size: 21px; font-weight: 600; margin: 0 0 6px; }
+  .pillar-blurb { font-size: 14px; color: var(--ink-soft); line-height: 1.5; margin: 0 0 18px; }
+  .lead-badge {
+    position: absolute; top: 16px; right: 16px;
+    font-size: 10.5px; font-weight: 600; letter-spacing: .05em;
+    text-transform: uppercase; padding: 3px 8px; border-radius: 99px;
+  }
+  .progress-bar { display: flex; align-items: center; justify-content: space-between; }
+  .progress-bar-track { flex: 1; height: 6px; background: var(--blush);
+    border-radius: 99px; margin-right: 12px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; border-radius: 99px; transition: width .4s; }
+  .progress-bar-text { font-size: 12px; color: var(--ink-faint); white-space: nowrap; }
+
+  .find-card { background: var(--ink); color: var(--cream); border: 1px solid var(--ink); }
+  .find-card .pillar-blurb { color: #D8C2C4; }
+  .find-card .pillar-title { color: var(--cream); }
+
+  /* CHILDCARE NUDGE */
+  .nudge {
+    margin-top: 28px; background: var(--blush); border: 1px solid var(--line);
+    border-radius: 18px; padding: 20px 24px;
+    display: flex; gap: 16px; align-items: flex-start;
+  }
+  .nudge-title { font-family: var(--font-display); font-weight: 600; font-size: 17px; }
+  .nudge-body { font-size: 14px; color: var(--ink-soft); margin: 4px 0 0; line-height: 1.5; }
+
+  /* PILLAR DETAIL */
+  .back-btn {
+    background: var(--cream-card); border: 1px solid var(--line);
+    color: var(--plum); font-size: 14px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 10px 16px 10px 12px; border-radius: 99px;
+    margin-bottom: 24px; cursor: pointer;
+    transition: background .2s, transform .15s;
+  }
+  .back-btn:hover { background: #fff; }
+  .back-btn:active { transform: scale(.96); }
+  .pillar-head { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+  .pillar-head-icon { width: 52px; height: 52px; border-radius: 15px;
+    display: grid; place-items: center; }
+  .pillar-head h2 { font-family: var(--font-display); font-size: 30px; font-weight: 600; margin: 0; }
+
+  .item-list { display: flex; flex-direction: column; gap: 12px; }
+  .item { background: var(--cream-card); border: 1px solid var(--line);
+    border-radius: 16px; overflow: hidden; transition: border-color .2s; }
+  .item.open { border-color: currentColor; }
+  .item-row { display: flex; align-items: flex-start; gap: 14px; padding: 18px 20px; }
+  .item-check {
+    flex-shrink: 0; margin-top: 1px; width: 26px; height: 26px;
+    border-radius: 8px; border: 2px solid var(--blush);
+    background: transparent; display: grid; place-items: center;
+  }
+  .item-check.checked { border: none; }
+  .item-body { flex: 1; cursor: pointer; }
+  .item-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .item-title { font-size: 16px; font-weight: 600; line-height: 1.3; }
+  .item-title.done { color: var(--ink-faint); text-decoration: line-through; }
+  .flag-pill { display: inline-block; margin-top: 8px; font-size: 11px;
+    font-weight: 600; letter-spacing: .03em; padding: 3px 9px; border-radius: 99px; }
+  .item-desc { font-size: 14.5px; color: var(--ink-soft); line-height: 1.6;
+    margin: 12px 0 2px; }
+  .item-links { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+  .item-link { display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13.5px; font-weight: 600; text-decoration: none;
+    width: fit-content; padding-bottom: 1px;
+    border-bottom: 1.5px solid currentColor; }
+  .item-link-empty { font-size: 12px; color: var(--ink-faint);
+    font-style: italic; margin: 12px 0 2px; }
+
+  /* PROVIDER CARDS */
+  .provider-card { background: var(--cream-card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 20px; border-top: 4px solid; }
+  .provider-card h3 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0 0 2px; }
+  .provider-best { font-size: 12.5px; font-weight: 600; margin-bottom: 12px; }
+  .provider-list { margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 7px; }
+  .provider-list li { font-size: 13px; color: var(--ink-soft);
+    line-height: 1.4; display: flex; gap: 8px; }
+  .bullet { font-weight: 700; flex-shrink: 0; }
+
+  /* MONEY ESTIMATOR */
+  .estimator {
+    background: var(--cream-card); border: 1px solid var(--line);
+    border-radius: 22px; padding: 28px 28px 32px; margin-bottom: 28px;
+  }
+  .estimator h2 { font-family: var(--font-display); font-size: 26px; font-weight: 600; margin: 0; }
+  .est-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .est-sub { color: var(--ink-soft); font-size: 14px; margin: 0 0 24px; }
+  .slider-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+  .slider-label { font-size: 14px; font-weight: 600; }
+  .slider-value { font-family: var(--font-display); font-weight: 600; font-size: 17px; color: var(--plum); }
+  input[type=range] {
+    -webkit-appearance: none; width: 100%; height: 6px;
+    border-radius: 99px; background: var(--blush); outline: none;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 22px; height: 22px;
+    border-radius: 50%; background: var(--plum); cursor: pointer;
+    border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+  input[type=range]::-moz-range-thumb {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--plum); cursor: pointer;
+    border: 3px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,.18);
+  }
+  .option-grid { display: flex; gap: 8px; }
+  .option-btn { flex: 1; padding: 10px; border-radius: 10px;
+    font-size: 13px; font-weight: 600; border: 1px solid var(--line);
+    background: transparent; color: var(--ink); }
+  .option-btn.selected { border: 2px solid var(--plum); background: var(--blush); }
+  .est-result {
+    background: var(--ink); border-radius: 18px; padding: 24px;
+    color: var(--cream); align-self: start;
+  }
+  .est-label { font-size: 13px; color: #D8C2C4;
+    text-transform: uppercase; letter-spacing: .08em; }
+  .est-big { font-family: var(--font-display); font-size: 40px;
+    font-weight: 600; line-height: 1.1; }
+  .est-cap { font-size: 12px; color: var(--ink-faint); margin-bottom: 18px; }
+  .est-row { display: flex; justify-content: space-between;
+    align-items: baseline; padding: 5px 0; }
+  .est-row-k { font-size: 13px; color: #D8C2C4; }
+  .est-row-v { font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #fff; }
+  .est-row.hi .est-row-k, .est-row.hi .est-row-v { color: var(--blush); }
+  .est-row.big .est-row-k { font-size: 14px; }
+  .est-row.big .est-row-v { font-size: 24px; }
+  .est-divider { border-top: 1px solid rgba(251,244,241,.18); margin: 14px 0; }
+  .est-foot { font-size: 11px; color: var(--ink-faint); margin-top: 14px; line-height: 1.5; }
+
+  /* FIRST DAYS */
+  .health-callout {
+    background: var(--dusk); color: var(--cream); border-radius: 16px;
+    padding: 16px 20px; display: flex; gap: 14px; align-items: flex-start;
+    margin-bottom: 22px;
+  }
+  .health-callout strong { font-family: var(--font-display); }
+  .health-link { color: var(--blush); border-bottom-color: rgba(237,213,213,.5); }
+  .track-toggle { display: flex; gap: 8px; margin-bottom: 20px; }
+  .track-btn {
+    flex: 1; padding: 12px; border-radius: 12px; font-size: 14px;
+    font-weight: 600; display: flex; align-items: center;
+    justify-content: center; gap: 8px;
+    border: 1px solid var(--line); background: var(--cream-card); color: var(--ink);
+  }
+  .track-btn.selected { border: 2px solid var(--dusk); background: rgba(140,106,120,.08); }
+
+  /* TRYING / EDITOR PICK */
+  .pick-card {
+    background: var(--cream-card); border: 1px solid var(--line);
+    border-top: 4px solid var(--sage); border-radius: 16px;
+    padding: 20px 22px; margin-bottom: 14px;
+    transition: transform .25s cubic-bezier(.2,.8,.2,1), box-shadow .25s;
+  }
+  .pick-card:hover { transform: translateY(-3px); box-shadow: 0 18px 40px -18px rgba(122,74,82,.30); }
+  .pick-badge {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+    font-size: 11.5px; font-weight: 700; letter-spacing: .06em;
+    text-transform: uppercase; color: var(--terracotta);
+  }
+  .pick-card h3 { font-family: var(--font-display); font-size: 22px; font-weight: 600; margin: 0 0 6px; }
+  .pick-body { font-size: 14px; color: var(--ink-soft); line-height: 1.55; margin: 0 0 14px; }
+  .pick-link { display: inline-flex; align-items: center; gap: 6px;
+    font-size: 13.5px; font-weight: 600; color: var(--plum);
+    text-decoration: none; border-bottom: 1.5px solid rgba(122,74,82,.33); padding-bottom: 1px; }
+  .pick-disclaimer { font-size: 11.5px; color: var(--ink-faint);
+    margin: 14px 0 0; line-height: 1.5; font-style: italic; }
+  .criteria-card {
+    background: rgba(156,168,142,.08); border: 1px solid rgba(156,168,142,.25);
+    border-radius: 16px; padding: 18px 22px;
+  }
+  .criteria-head {
+    display: flex; align-items: center; gap: 8px; margin-bottom: 12px;
+    font-family: var(--font-display); font-weight: 600; font-size: 16px;
+  }
+  .criteria-list { margin: 0; padding: 0; list-style: none;
+    display: flex; flex-direction: column; gap: 8px; }
+  .criteria-list li { font-size: 13.5px; color: var(--ink-soft); line-height: 1.45;
+    display: flex; gap: 9px; }
+  .criteria-list .bullet { color: var(--olive); }
+
+  /* FOOTER */
+  footer { border-top: 1px solid var(--line); padding: 28px 24px;
+    text-align: center; color: var(--ink-faint); font-size: 12.5px; }
+
+  /* STICKY BOTTOM NAV (mobile-friendly always-back) */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+    background: rgba(251,244,241,.95); backdrop-filter: blur(10px);
+    border-top: 1px solid var(--line);
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    display: flex; gap: 10px; justify-content: center;
+  }
+  .bottom-nav button {
+    flex: 1; max-width: 280px;
+    background: var(--plum); color: #fff; border: none;
+    padding: 14px 18px; border-radius: 99px;
+    font-size: 15px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .bottom-nav button:active { transform: scale(.97); }
+  /* leave room above the bottom nav so content isn't covered */
+  main.has-bottom-nav { padding-bottom: 120px; }
+
+  /* ANIM */
+  .fade { animation: fadeIn .5s both; }
+  @keyframes fadeIn { from { opacity:0; transform: translateY(10px);} to {opacity:1; transform:none;} }
+
+  /* utility */
+  .hidden { display: none !important; }
+  .dashboard-intro h2 { font-family: var(--font-display);
+    font-size: clamp(26px,4vw,38px); font-weight: 600; margin: 0 0 6px; }
+  .dashboard-intro p { color: var(--ink-soft); font-size: 16px; max-width: 620px; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- Inline SVG icon definitions used across the app -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-chevron-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></symbol>
+    <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="i-baby" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h.01"/><path d="M15 12h.01"/><path d="M10 16c.5.3 1.5.5 2 .5s1.5-.2 2-.5"/><path d="M19 6.3a9 9 0 0 1 1.8 3.9 2 2 0 0 1 0 3.6 9 9 0 0 1-17.6 0 2 2 0 0 1 0-3.6A9 9 0 0 1 12 3c2 0 3.5 1.1 3.5 2.5s-.9 2.5-2 2.5c-.8 0-1.5-.4-1.5-1"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20h10"/><path d="M10 20c5.5-2.5.8-6.4 3-10"/><path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/><path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/></symbol>
+    <symbol id="i-stethoscope" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.8 2.3A.3.3 0 1 0 5 2H4a2 2 0 0 0-2 2v5a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V4a2 2 0 0 0-2-2h-1a.2.2 0 1 0 .3.3"/><path d="M8 15v1a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6v-4"/><circle cx="20" cy="10" r="2"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></symbol>
+    <symbol id="i-piggy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 5c-1.5 0-2.8 1.4-3 2-3.5-1.5-11-.3-11 5 0 1.8 0 3 2 4.5V20h4v-2h3v2h4v-4c1-.5 1.7-1 2-2h2v-4h-2c0-1-.5-1.5-1-2V5z"/><path d="M2 9v1c0 1.1.9 2 2 2h1"/><path d="M16 11h0"/></symbol>
+    <symbol id="i-dollar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8M12 18V6"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+    <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+    <symbol id="i-heartpulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/><path d="M3.22 12H9.5l.5-1 2 4.5 2-7 1.5 3.5h5.27"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+    <symbol id="i-protea" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 6 C20 12 20 16 24 20 C28 16 28 12 24 6 Z"/>
+      <path d="M10 12 C14 16 18 18 22 18 C20 14 16 12 10 12 Z"/>
+      <path d="M38 12 C34 16 30 18 26 18 C28 14 32 12 38 12 Z"/>
+      <path d="M7 24 C13 25 18 24 21 21 C16 19 11 20 7 24 Z"/>
+      <path d="M41 24 C35 25 30 24 27 21 C32 19 37 20 41 24 Z"/>
+      <circle cx="24" cy="24" r="6"/>
+      <path d="M24 24 L24 30"/><path d="M24 24 L19 27"/><path d="M24 24 L29 27"/>
+      <path d="M24 30 C24 36 24 40 24 43"/>
+      <path d="M24 38 C26 36 29 35 31 35"/><path d="M24 36 C22 34 19 33 17 33"/>
+    </symbol>
+  </defs>
+</svg>
+
+<header class="site">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-mark"><svg width="22" height="22" style="color:#fff"><use href="#i-protea"/></svg></div>
+      <div>
+        <div class="brand-name">The Inisfree Collective</div>
+        <div class="brand-sub">The Canadian parent OS</div>
+      </div>
+    </div>
+    <div id="header-prov" class="header-prov hidden"></div>
+  </div>
+</header>
+
+<section id="onboarding" class="onboarding">
+  <div class="fade">
+    <p class="eyebrow">For expectant &amp; new parents in Canada</p>
+    <h1 class="hero">Every confusing, Canada-specific thing about having a baby — in one calm checklist.</h1>
+    <p class="lede">EI and your top-up. Finding a midwife, a hospital, a pelvic floor physio. The first few days with a newborn — and recovering yourself. Birth certificate → SIN → health card → CCB in the right order. RESP, the Canada Child Benefit, a will. Tailored to your province.</p>
+  </div>
+
+  <label class="qlabel">First — where in Canada are you?</label>
+  <div id="prov-grid" class="prov-grid"></div>
+
+  <div id="stage-wrap" class="hidden">
+    <label class="qlabel">And where are you in the journey?</label>
+    <div id="stage-grid" class="stage-grid"></div>
+  </div>
+
+  <button id="cta" class="cta" disabled>Build my plan <svg width="18" height="18"><use href="#i-chevron-right"/></svg></button>
+</section>
+
+<main id="dashboard" class="hidden"></main>
+
+<footer>
+  Prototype · Health content is general information, not medical advice — when in doubt, call 811 or your provider. Figures verified for 2026.
+</footer>
+
+<div id="bottom-nav" class="bottom-nav hidden"></div>
+
+<script>
+/* ============== Data ============== */
+const PROVINCES = [
+  {code:"ON",name:"Ontario"},{code:"BC",name:"British Columbia"},
+  {code:"AB",name:"Alberta"},{code:"QC",name:"Quebec"},
+  {code:"MB",name:"Manitoba"},{code:"SK",name:"Saskatchewan"},
+  {code:"NS",name:"Nova Scotia"},{code:"NB",name:"New Brunswick"},
+  {code:"NL",name:"Newfoundland & Labrador"},{code:"PE",name:"Prince Edward Island"},
+  {code:"Other",name:"Territories / Other"},
+];
+const C = {plum:"#7A4A52", sage:"#9CA88E", terracotta:"#C77F5E",
+  rose:"#B56B72", olive:"#7D8A66", clay:"#A86A4F", dusk:"#8C6A78", blush:"#EDD5D5"};
+const EI = {maxStd:729, maxExt:437, mie:68900, rate:0.55, extRate:0.33};
+const STAGES = [
+  {id:"trying",label:"Trying to conceive",sub:"Or thinking about it",icon:"i-sprout"},
+  {id:"expecting",label:"Expecting",sub:"Pregnant or planning",icon:"i-heart"},
+  {id:"thirdtri",label:"Third trimester",sub:"Birth prep mode",icon:"i-calendar"},
+  {id:"newborn",label:"New baby is here",sub:"0–3 months",icon:"i-baby"},
+  {id:"settling",label:"Settling in",sub:"3–18 months",icon:"i-sparkles"},
+];
+const PILLARS = [
+  {id:"trying",title:"Before You Try",blurb:"Pre-conception checks, fertility clinics, and what Canada will fund.",icon:"i-sprout",accent:C.sage},
+  {id:"money",title:"Leave & Money",blurb:"EI, your employer top-up, and what actually lands in your account.",icon:"i-dollar",accent:C.plum},
+  {id:"birth",title:"Birth Prep",blurb:"Care provider, hospital, classes, pelvic floor, the car seat.",icon:"i-stethoscope",accent:C.olive},
+  {id:"firstdays",title:"The First Few Days",blurb:"Right after birth — caring for baby, and recovering yourself.",icon:"i-sun",accent:C.dusk},
+  {id:"newborn",title:"New Baby Logistics",blurb:"Paediatrician, vaccines, feeding support, milestones.",icon:"i-baby",accent:C.rose},
+  {id:"paperwork",title:"The Paperwork",blurb:"Register the birth, health card, SIN, passport — in the right order.",icon:"i-file",accent:C.clay},
+  {id:"future",title:"Setting Them Up",blurb:"RESP, Canada Child Benefit, a will, and a guardian.",icon:"i-piggy",accent:C.terracotta},
+];
+const LINKS = {
+  ei_apply:{label:"Apply for EI maternity & parental benefits", url:"https://www.canada.ca/en/services/benefits/ei/ei-maternity-parental/apply.html"},
+  ei_amount:{label:"How much EI you could receive (official estimator)", url:"https://www.canada.ca/en/services/benefits/ei/ei-maternity-parental/benefit-amount.html"},
+  qpip:{label:"Quebec Parental Insurance Plan (QPIP)", url:"https://www.rqap.gouv.qc.ca/en"},
+  ccb:{label:"Canada Child Benefit (CRA)", url:"https://www.canada.ca/en/revenue-agency/services/child-family-benefits/canada-child-benefit-overview.html"},
+  sin:{label:"Apply for a Social Insurance Number", url:"https://www.canada.ca/en/employment-social-development/services/sin.html"},
+  passport_child:{label:"Child passport application", url:"https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-passports/child-passport.html"},
+  cesg:{label:"Canada Education Savings Grant (CESG)", url:"https://www.canada.ca/en/services/benefits/education/education-savings/grant.html"},
+  resp:{label:"About RESPs", url:"https://www.canada.ca/en/services/benefits/education/education-savings/resp.html"},
+  clb:{label:"Canada Learning Bond ($2,000, no contribution)", url:"https://www.canada.ca/en/services/benefits/education/education-savings/learning-bond.html"},
+  rdsp:{label:"Registered Disability Savings Plan (RDSP)", url:"https://www.canada.ca/en/employment-social-development/programs/disability/savings.html"},
+  car_seat:{label:"Transport Canada — choosing a car seat", url:"https://tc.canada.ca/en/road-transportation/child-car-seat-safety"},
+  immunization:{label:"Canadian immunization schedule", url:"https://www.canada.ca/en/public-health/services/provincial-territorial-immunization-information.html"},
+  ON_newborn_bundle:{label:"Ontario Newborn Registration (5-in-1 bundle)", url:"https://www.ontario.ca/page/register-birth-new-baby"},
+  ON_health_card:{label:"Apply for an Ontario health card (OHIP)", url:"https://www.ontario.ca/page/health-cards"},
+  ON_811:{label:"Health811 — call 811 or chat with a nurse 24/7", url:"https://health811.ontario.ca"},
+  ON_fertility:{label:"Ontario Fertility Program", url:"https://www.ontario.ca/page/get-fertility-treatments"},
+  ON_child_benefit:{label:"Ontario Child Benefit", url:"https://www.ontario.ca/page/ontario-child-benefit"},
+};
+const TWIG_PROVINCES = ["ON","BC"];
+const EDITOR_PICK = {
+  name:"Twig Fertility", url:"https://twigfertility.com",
+  whyBase:"A modern, patient-centred clinic with transparent pricing, a dedicated care team, an on-site IVF lab, and an explicitly trans-affirming, inclusive space.",
+  cityNote:{ON:"Clinics in Toronto (Midtown & Downtown), and an approved Ontario Fertility Program provider.",BC:"Clinic in Vancouver."},
+};
+const CLINIC_CRITERIA = [
+  "Success rates published transparently (and by age group, not just headline numbers)",
+  "Clear, upfront pricing — ask for an all-in cost estimate, not just the cycle fee",
+  "Whether they're approved under your province's funded program",
+  "Wait time for a first consult and to start treatment",
+  "On-site IVF lab vs. sending samples elsewhere",
+  "How they handle the emotional side — counselling, a named care team",
+  "Inclusive of your family structure (LGBTQ2S+, single-parent)",
+];
+const PROVIDERS = [
+  {name:"Midwife",color:C.olive,who:"Healthy, lower-risk pregnancies",
+    pts:["Publicly funded — free","Hospital, birth-centre, or home birth","Continuity: same small team throughout","Home visits + several appointments in week one","Will transfer care to an OB if complications arise"]},
+  {name:"Obstetrician (OB)",color:C.plum,who:"Higher-risk or complex pregnancies",
+    pts:["Publicly funded — free (referral usually needed)","Hospital birth","Surgical training (C-sections)","May rotate within a practice group","Six-week postpartum check-up booked separately"]},
+  {name:"Family doctor",color:C.clay,who:"Lower-risk, if yours does deliveries",
+    pts:["Publicly funded — free","Hospital birth","Already knows your history","Fewer family docs still do deliveries","Can continue as baby's doctor too"]},
+];
+const BABY_TRACK = [
+  {t:"The 24–72 hour check-up",d:"Before you leave, the hospital schedules baby's first visit within 24 to 72 hours of discharge — a weight check and a jaundice (yellow skin/eyes) look. This is required, not optional. Bring the discharge summary form to it."},
+  {t:"Is feeding working? Count diapers",d:"In the early days the simplest signal that baby is getting enough is output: roughly as many wet diapers per day as days old, building toward 6+ wet and 3+ dirty by day 5–6. Latch help is a phone call away — don't wait."},
+  {t:"Jaundice watch",d:"Mild yellowing is common and usually fine. But yellow that's spreading down to the belly or legs, a baby who's very sleepy and hard to wake, or poor feeding warrants a call to 811 or your provider the same day."},
+  {t:"Safe sleep, every sleep",d:"Alone, on the Back, in a bare Crib (the ABCs). No pillows, bumpers, or loose blankets. Room-sharing without bed-sharing for the first 6 months lowers risk."},
+  {t:"Cord & skin care",d:"Keep the cord stump clean and dry; it falls off in 1–3 weeks. Sponge baths until then. A little dried blood is normal — redness spreading onto the belly skin is not, and means call."},
+  {t:"The public-health nurse will call",d:"In most provinces a public health nurse phones within 2–3 days of discharge to check on you both and can visit. Say yes — it's free, and they're a goldmine for feeding and settling help."},
+];
+const YOU_TRACK = [
+  {t:"Bleeding (lochia) — what's normal",d:"Vaginal bleeding for several weeks that gradually fades from red to pink to brown is expected. Soaking a pad an hour, passing clots bigger than a golf ball, or a sudden gush after it had slowed are reasons to call your provider or 811 now."},
+  {t:"Healing down there / C-section site",d:"Stitches, swelling and soreness are normal early on. Use the peri bottle, ice, and rest. Increasing pain, spreading redness, a bad smell, or fever can signal infection — get it checked rather than waiting it out."},
+  {t:"Your body's warning signs",d:"Some symptoms mean don't wait: a severe headache that won't ease, vision changes or seeing spots, sudden swelling of face or hands, chest pain or trouble breathing, calf pain or swelling, or a fever. These can be signs of serious postpartum conditions. Call 811, your provider, or go to emergency."},
+  {t:"Engorgement & sore nipples",d:"Around day 3–5 your milk 'comes in' and breasts can feel rock-hard. Frequent feeding, warmth before and cold after, and hand-expression help. Cracked or bleeding nipples usually mean a latch fix — book a lactation consultant."},
+  {t:"Baby blues vs. something more",d:"Weepy, up-and-down emotions in the first two weeks are extremely common ('baby blues'). If low mood, anxiety, or hopelessness lasts beyond two weeks or feels heavy, that's postpartum depression/anxiety — very treatable. Reach out to your provider. Applies to partners too."},
+  {t:"Rest, food, and let people help",d:"Recovery is real recovery. Sleep when you can, eat and drink steadily, and accept every offer of a meal or a load of laundry. Doing too much too soon slows healing."},
+];
+
+function buildChecklist(prov){
+  const isQC = prov === "QC";
+  const provName = (PROVINCES.find(p=>p.code===prov)||{}).name || "your province";
+  return {
+    trying: [
+      {t:"Book a pre-conception visit with your doctor",d:"The single best first step. Your family doctor reviews your health, medications, and family history, updates vaccines (rubella, chickenpox), and flags anything to address before pregnancy. Both partners can go.",flag:"Start here"},
+      {t:"Start folic acid now — before conceiving",d:"0.4 mg daily (often higher if advised) at least 2–3 months before trying lowers the risk of neural tube defects. A pre-natal multivitamin covers it. This is one of the few things with strong, clear evidence."},
+      {t:"Get the standard pre-conception bloodwork",d:"Typically: rubella and varicella immunity, hepatitis B, HIV, syphilis, blood type/Rh, ferritin/iron, thyroid (TSH), and a Pap if due. Carrier screening for genetic conditions is increasingly offered — ask."},
+      {t:"Sort the lifestyle basics (both partners)",d:"Stop smoking and recreational drugs, cut alcohol, review caffeine, aim for a healthy weight, and look at sleep and stress. Sperm health matters as much as egg health — this is a two-person checklist."},
+      {t:"Track your cycle to find your fertile window",d:"Most conception happens in the few days before ovulation. A simple app, ovulation predictor kits, or basal temperature tracking helps you time things. No need to over-engineer it early on."},
+      {t:"Know when to seek fertility help",d:"General guidance: see a doctor after 12 months of trying if you're under 35, or after 6 months if you're 35+. Go sooner if you have irregular cycles, known reproductive conditions (PCOS, endometriosis), or a history that worries you.",flag:"Timing rule"},
+      {t:"Understand what Canada will fund",d:"Coverage varies a lot by province. Ontario funds one IVF cycle per eligible patient through the Ontario Fertility Program, and from the 2025 tax year offers a refundable fertility tax credit (25% of eligible costs). BC, Quebec and others have their own programs. Check yours — it changes the math enormously.",flag:"Province-specific",links: prov==="ON"?[LINKS.ON_fertility]:[]},
+      {t:"Look into LGBTQ2S+ and single-parent paths",d:"Donor sperm, donor eggs, IUI, reciprocal IVF, and surrogacy are all available in Canada. Many clinics (including Twig) are explicitly trans-affirming and build inclusive care plans. Funding rules differ — ask the clinic directly."},
+    ],
+    money: [
+      {t: isQC?"Understand QPIP — Quebec's own plan (not EI)":"Understand EI maternity + parental benefits",
+       d: isQC?"Quebec runs its own Régime québécois d'assurance parentale (QPIP/RQAP) instead of federal EI. Rates, weeks and the waiting period differ — check rqap.gouv.qc.ca, not Service Canada.":"Maternity: up to 15 weeks for the birthing parent at 55%. Parental: shared between parents, either Standard (40 wks, 55%) or Extended (69 wks, 33%). You pick once and can't switch.",
+       flag: isQC?"Quebec-specific":"Federal", links: isQC?[LINKS.qpip]:[LINKS.ei_amount]},
+      {t:"Find out if your employer has a top-up (SUB plan)",d:"Many employers top EI up to 75–100% of salary for a set number of weeks. This is separate from EI and from job-protected leave. Ask HR for the exact weeks and percentage in writing.",flag:"Ask HR"},
+      {t:"Confirm your job-protected leave length",d:"EI/QPIP pays you; "+provName+"'s employment standards protect your job. These are different lengths. Know both dates.",flag:"Provincial law"},
+      {t:"Apply for EI/QPIP as soon as you stop working",d:"Don't wait. Apply within 4 weeks of your last day or you risk losing benefits. You'll need your Record of Employment (ROE) — your employer files it electronically.",flag:"Time-sensitive", links: isQC?[LINKS.qpip]:[LINKS.ei_apply]},
+      {t:"Decide Standard vs Extended before you apply",d:"Extended pays less per week but stretches longer. If a top-up only covers a few months, Standard often nets more. Run both through the estimator above."},
+    ],
+    birth: [
+      {t:"Choose your care provider: OB, family doctor, or midwife",d:"Three real options in Canada, each free under provincial health coverage. See the comparison above — it's one of the first and most personal choices you'll make. Decide early; midwife rosters fill fast.",flag:"Big decision"},
+      {t:"Register at a hospital / birth centre near you",d:"Pre-register so admission is fast when labour starts. Tour the unit if offered. Confirm what's covered vs. private-room upgrade costs."},
+      {t:"Book prenatal + breastfeeding classes",d:"Public Health units run free or low-cost prenatal classes, and often breastfeeding sessions — book before the third trimester as spots are limited."},
+      {t:"Line up a pelvic floor physiotherapist",d:"Pelvic floor physio (prenatal and postpartum) is standard care in Canada but rarely auto-referred. Often covered by extended health benefits. Book a postpartum assessment for ~6 weeks after birth now.",flag:"Often forgotten"},
+      {t:"Buy and install an approved car seat",d:"By law you cannot leave the hospital without a properly installed, Canada-approved rear-facing seat. Many fire halls / Public Health offer free install checks.",flag:"Legally required", links:[LINKS.car_seat]},
+      {t:"Pack a hospital bag + write a light birth plan",d:"Bag: ID, health card, going-home outfit for baby, comfortable clothes, phone charger. A birth plan is a preferences sheet, not a script — keep it one page and flexible."},
+      {t:"Know what hospital screening to expect",d:"Newborn blood-spot screening and a hearing test happen before discharge automatically. Nothing to book — just know it's coming."},
+    ],
+    newborn: [
+      {t:"Find a paediatrician or family doctor for baby",d:"Line this up before discharge — the first visit is usually within 24–72 hours of going home (weight check + jaundice). A family doctor is fully appropriate.",flag:"Before discharge"},
+      {t:"Know the Canadian immunization schedule",d:"First shots are typically at 2 months, then 4, 6, 12, and 18 months, following your province's publicly funded schedule. Keep your own record (the yellow card).", links:[LINKS.immunization]},
+      {t:"Set up breastfeeding / feeding support",d:"Public Health breastfeeding clinics and lactation consultants (IBCLCs) exist in every region. La Leche League is free. Make the first call in week one."},
+      {t:"Watch developmental milestones (and the 18-month visit)",d:"Track rolling, sitting, babbling, first words. The enhanced 18-month well-baby visit is a key Canadian checkpoint for development and school readiness — book it.",flag:"Canada-specific"},
+      {t:"Screen your own mental health",d:"Postpartum mood and anxiety disorders affect roughly 1 in 5 parents and are very treatable. Ask your provider about screening. Applies to non-birthing partners too.",flag:"Don't skip"},
+    ],
+    paperwork: [
+      {t: isQC?"Register the birth with Directeur de l'état civil":"Register the birth (use the bundled online service)",
+       d: isQC?"In Quebec, birth registration goes through the Directeur de l'état civil. Do this first — everything else depends on it.":"Most provinces (incl. "+provName+") offer a 4-in-1 Newborn Registration Service: register the birth, order the birth certificate, apply for the SIN, AND apply for the Canada Child Benefit in one online form. Use it — it saves weeks.",
+       flag: isQC?"Quebec route":"4-in-1 shortcut", links: prov==="ON"?[LINKS.ON_newborn_bundle]:[]},
+      {t:"Order the birth certificate",d:"The legal document everything else references. If you used the bundle, it's already in motion. You'll need it for the passport.", links: prov==="ON"?[LINKS.ON_newborn_bundle]:[]},
+      {t:"Get baby a SIN (Social Insurance Number)",d:"Free. Needed to open an RESP and for the CCB. Included in the newborn bundle in most provinces, otherwise apply through Service Canada.", links:[LINKS.sin]},
+      {t:"Add baby to provincial health coverage",d:"Register for "+provName+"'s health card (e.g. OHIP in Ontario, MSP in BC, RAMQ in Quebec) so baby's visits are covered from day one.", links: prov==="ON"?[LINKS.ON_health_card]:[]},
+      {t:"Apply for a passport (only if travelling)",d:"Child passports are valid 5 years. Requires the birth certificate, photos, and a guarantor. Not urgent unless you have travel planned.", links:[LINKS.passport_child]},
+      {t:"Confirm the Canada Child Benefit (CCB) is flowing",d:"If you applied via the newborn bundle, no separate step. Otherwise apply through CRA My Account. Tax-free, monthly, on the 20th.", links:[LINKS.ccb]},
+    ],
+    future: [
+      {t:"Open an RESP and start the CESG grant",d:"Contribute up to $2,500/yr to capture the 20% Canada Education Savings Grant — free $500/yr, up to $7,200 lifetime per child. Lower-income families get extra CESG + the Canada Learning Bond ($2,000, no contribution needed).",flag:"Free money", links:[LINKS.cesg, LINKS.clb]},
+      {t:"Pick an RESP provider (avoid lock-in plans)",d:"Self-directed RESPs at the big banks or low-fee brokerages give flexibility. Be cautious with group/scholarship-plan dealers that charge enrolment fees and have rigid rules.",flag:"Watch fees", links:[LINKS.resp]},
+      {t:"Understand the Canada Child Benefit you're getting",d:"Max for the current period is $7,997/yr per child under 6 (~$666/mo), tax-free, reducing above ~$37,487 family net income. Rises in July 2026. Many provinces add their own benefit on top.", links: prov==="ON"?[LINKS.ccb, LINKS.ON_child_benefit]:[LINKS.ccb]},
+      {t:"Write (or update) a will naming a guardian",d:"Without a will, a court decides who raises your child. Naming a guardian is the single most important reason new parents need a will. Online services (Willful, Epilogue) are valid in most provinces.",flag:"Most important"},
+      {t:"Get term life + disability insurance",d:"If someone depends on your income, term life is cheap and essential. Disability insurance protects the more likely risk — your ability to earn. Pair this with the will."},
+      {t:"Check if an RDSP applies",d:"If your child has or develops a disability, the Registered Disability Savings Plan comes with generous matching grants and bonds. Worth knowing it exists.", links:[LINKS.rdsp]},
+    ],
+    firstdays: [],
+  };
+}
+
+/* ============== State ============== */
+const state = {
+  province:"", stage:"", activePillar:null, openItem:null, track:"baby",
+  done:{}, salary:72000, option:"std", topupPct:0, topupWeeks:0,
+};
+function setState(patch){ Object.assign(state,patch); render(); }
+
+/* ============== Helpers ============== */
+const $ = sel => document.querySelector(sel);
+const el = (tag, attrs={}, ...children) => {
+  const e = document.createElement(tag);
+  for (const k in attrs) {
+    if (k === "style") Object.assign(e.style, attrs[k]);
+    else if (k === "class") e.className = attrs[k];
+    else if (k === "html") e.innerHTML = attrs[k];
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2).toLowerCase(), attrs[k]);
+    else if (attrs[k] === true) e.setAttribute(k, "");
+    else if (attrs[k] != null && attrs[k] !== false) e.setAttribute(k, attrs[k]);
+  }
+  children.flat().forEach(c => {
+    if (c == null || c === false) return;
+    e.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+  });
+  return e;
+};
+const icon = (id, size=18, color) => {
+  const s = el("svg", {width:size, height:size, "aria-hidden":"true"});
+  if (color) s.style.color = color;
+  s.innerHTML = `<use href="#${id}"/>`;
+  return s;
+};
+const provName = code => (PROVINCES.find(p=>p.code===code)||{}).name || "";
+const tint = (hex, alpha) => hex + alpha; // hex with appended alpha hex digits (e.g. "1f")
+
+/* ============== Render: onboarding ============== */
+function renderProvGrid(){
+  const g = $("#prov-grid");
+  g.innerHTML = "";
+  PROVINCES.forEach(p => {
+    const b = el("button", {
+      class: "opt-btn" + (state.province===p.code ? " selected" : ""),
+      onclick: () => setState({province:p.code})
+    }, p.name);
+    g.appendChild(b);
+  });
+}
+function renderStageGrid(){
+  const wrap = $("#stage-wrap");
+  if (!state.province) { wrap.classList.add("hidden"); return; }
+  wrap.classList.remove("hidden");
+  const g = $("#stage-grid");
+  g.innerHTML = "";
+  STAGES.forEach(s => {
+    const b = el("button", {
+      class:"stage-btn" + (state.stage===s.id ? " selected" : ""),
+      onclick: () => setState({stage:s.id})
+    },
+      icon(s.icon, 26, C.plum),
+      el("div", {class:"stage-btn-title"}, s.label),
+      el("div", {class:"stage-btn-sub"}, s.sub)
+    );
+    g.appendChild(b);
+  });
+}
+function renderCTA(){
+  const c = $("#cta");
+  c.disabled = !(state.province && state.stage);
+  c.onclick = () => {
+    if (!c.disabled) {
+      window.scrollTo({top:0, behavior:"smooth"});
+      render();
+    }
+  };
+}
+
+/* ============== Render: dashboard ============== */
+function calcEst(){
+  const weekly = state.salary/52;
+  const insurable = Math.min(weekly, EI.mie/52);
+  const r = state.option==="std" ? EI.rate : EI.extRate;
+  const cap = state.option==="std" ? EI.maxStd : EI.maxExt;
+  const eiWeekly = Math.min(insurable*r, cap);
+  const totalWeeks = 15 + (state.option==="std" ? 35 : 61);
+  const duringTopup = Math.max(eiWeekly, Math.min((state.salary/52)*(state.topupPct/100), state.salary/52));
+  const topupBonus = state.topupPct>0 ? Math.max(0, duringTopup-eiWeekly)*state.topupWeeks : 0;
+  const eiTotal = eiWeekly*totalWeeks;
+  return {
+    eiWeekly: Math.round(eiWeekly), totalWeeks,
+    eiTotal: Math.round(eiTotal),
+    topupBonus: Math.round(topupBonus),
+    grand: Math.round(eiTotal+topupBonus),
+  };
+}
+function pillarProgress(pid, checklist){
+  if (pid==="firstdays") {
+    const items = [...BABY_TRACK,...YOU_TRACK];
+    return { c: items.filter((_,i)=>state.done["firstdays-"+i]).length, total: items.length };
+  }
+  const items = checklist[pid] || [];
+  return { c: items.filter((_,i)=>state.done[pid+"-"+i]).length, total: items.length };
+}
+/* which pillars are relevant for the current stage */
+const STAGE_PILLARS = {
+  trying:    ["trying", "money", "future"],
+  expecting: ["money", "birth", "future"],
+  thirdtri:  ["money", "birth", "firstdays", "paperwork", "future"],
+  newborn:   ["firstdays", "newborn", "paperwork", "money", "future"],
+  settling:  ["newborn", "paperwork", "money", "future"],
+};
+function getLeadPillarId(){
+  if (state.stage==="newborn") return "firstdays";
+  if (state.stage==="trying") return "trying";
+  if (state.stage==="thirdtri") return "birth";
+  return null;
+}
+function orderedPillars(){
+  const ids = STAGE_PILLARS[state.stage] || PILLARS.map(p=>p.id);
+  return ids.map(id => PILLARS.find(p=>p.id===id)).filter(Boolean);
+}
+
+function renderHeaderProv(){
+  const wrap = $("#header-prov");
+  if (!state.province || !state.stage) { wrap.classList.add("hidden"); return; }
+  wrap.classList.remove("hidden");
+  wrap.innerHTML = "";
+  wrap.append(
+    icon("i-map-pin", 15),
+    document.createTextNode(" " + provName(state.province) + " "),
+    el("button",{onclick:()=>setState({province:"",stage:"",activePillar:null,done:{}})},"change")
+  );
+}
+
+function renderDashboard(){
+  const main = $("#dashboard");
+  main.innerHTML = "";
+  if (!(state.province && state.stage)) { main.classList.add("hidden"); return; }
+  main.classList.remove("hidden");
+
+  const checklist = buildChecklist(state.province);
+
+  if (!state.activePillar) {
+    main.appendChild(renderPillarGrid(checklist));
+    return;
+  }
+  if (state.activePillar === "money") main.appendChild(renderMoneyPillar(checklist));
+  else if (state.activePillar === "birth") main.appendChild(renderBirthPillar(checklist));
+  else if (state.activePillar === "firstdays") main.appendChild(renderFirstDays());
+  else if (state.activePillar === "trying") main.appendChild(renderTryingPillar(checklist));
+  else main.appendChild(renderPillarDetail(state.activePillar, checklist[state.activePillar], true));
+}
+
+function renderPillarGrid(checklist){
+  const root = el("div", {class:"fade"});
+  const intro = el("div", {class:"dashboard-intro"},
+    el("h2", {}, "Your plan, " + (STAGES.find(s=>s.id===state.stage)||{}).label.toLowerCase() + "."),
+    el("p", {},
+      state.stage==="newborn" ? "The first few days come first — caring for baby and for you. Everything else is below. "
+      : state.stage==="trying" ? "Start before you start — pre-conception checks, clinics, and funding. The rest of the journey is here when you need it. "
+      : "Pillars from leave paperwork to your child's future. ",
+      "Tap any one to open its Canada-specific, " + provName(state.province) + "-aware checklist."
+    )
+  );
+  root.appendChild(intro);
+
+  const grid = el("div", {class:"pillar-grid"});
+  const leadId = getLeadPillarId();
+  orderedPillars().forEach((p, idx) => {
+    const prog = pillarProgress(p.id, checklist);
+    const isLead = leadId === p.id;
+    const card = el("button", {
+      class: "card pillar-card" + (isLead ? " lead" : "") + " fade",
+      style: {color: p.accent, animationDelay: (idx*0.06)+"s"},
+      onclick: () => { setState({activePillar:p.id, openItem:null}); window.scrollTo({top:0, behavior:"smooth"}); }
+    });
+    card.appendChild(el("div", {class:"pillar-blob", style:{background:p.accent}}));
+    if (isLead) card.appendChild(el("span", {class:"lead-badge", style:{color:p.accent, background:p.accent+"1f"}}, "Start here"));
+    const iconWrap = el("div", {class:"pillar-icon-wrap", style:{background:p.accent+"1f"}}, icon(p.icon, 26, p.accent));
+    card.appendChild(iconWrap);
+    card.appendChild(el("h3", {class:"pillar-title", style:{color:"var(--ink)"}}, p.title));
+    card.appendChild(el("p", {class:"pillar-blurb"}, p.blurb));
+    const pBar = el("div", {class:"progress-bar"},
+      el("div", {class:"progress-bar-track"},
+        el("div", {class:"progress-bar-fill", style:{width: ((prog.c/prog.total)*100)+"%", background:p.accent}})
+      ),
+      el("span", {class:"progress-bar-text"}, prog.c + "/" + prog.total)
+    );
+    card.appendChild(pBar);
+    grid.appendChild(card);
+  });
+
+  // Find-near-you card
+  const find = el("div", {class:"card find-card fade", style:{animationDelay:".36s"}});
+  find.appendChild(el("div", {class:"pillar-icon-wrap", style:{background:"rgba(251,244,241,.12)"}}, icon("i-search", 26, C.blush)));
+  find.appendChild(el("h3", {class:"pillar-title"}, "Find it near you"));
+  find.appendChild(el("p", {class:"pillar-blurb"}, "Hospitals, midwife clinics, pelvic floor physio, prenatal classes, paediatricians and childcare waitlists — searchable by postal code."));
+  find.appendChild(el("div", {style:{marginTop:"16px", display:"inline-flex", alignItems:"center", gap:"6px", fontSize:"13px", color:C.blush}},
+    "Mockup — would plug into Google Places ", icon("i-chevron-right", 15)
+  ));
+  grid.appendChild(find);
+
+  root.appendChild(grid);
+
+  // Childcare nudge
+  const nudge = el("div", {class:"nudge fade"},
+    icon("i-alert", 22, C.plum),
+    el("div", {},
+      el("div", {class:"nudge-title"}, "Get on childcare waitlists now — even while pregnant."),
+      el("p", {class:"nudge-body"}, "Licensed spots (especially infant rooms) routinely have 12–24 month waits. With $10/day care (CWELCC) rolling out, demand is even higher. Join 4–6 lists today; you can always decline later.")
+    )
+  );
+  root.appendChild(nudge);
+  return root;
+}
+
+function backBtn(){
+  return el("button", {class:"back-btn", onclick:()=>{setState({activePillar:null, openItem:null}); window.scrollTo({top:0, behavior:"smooth"});}},
+    el("span", {style:{display:"inline-flex", transform:"rotate(180deg)"}}, icon("i-chevron-right", 16)),
+    el("span", {}, "All pillars")
+  );
+}
+
+function renderItem(pid, item, i, accent){
+  const key = pid + "-" + i;
+  const isDone = !!state.done[key];
+  const isOpen = state.openItem === key;
+  const wrap = el("div", {class:"item" + (isOpen?" open":""), style:{color:accent}});
+  const row = el("div", {class:"item-row"});
+  // checkbox
+  const check = el("button", {
+    class:"item-check" + (isDone?" checked":""),
+    style:{background: isDone ? accent : "transparent"},
+    onclick: (e) => { e.stopPropagation(); state.done[key]=!state.done[key]; render(); }
+  });
+  if (isDone) check.appendChild(icon("i-check", 16, "#fff"));
+  row.appendChild(check);
+  // body
+  const body = el("div", {class:"item-body", onclick: ()=>setState({openItem: isOpen ? null : key})});
+  const head = el("div", {class:"item-head"},
+    el("span", {class:"item-title" + (isDone?" done":""), style:{color: isDone? "var(--ink-faint)":"var(--ink)"}}, item.t),
+    icon(isOpen ? "i-chevron-down" : "i-chevron-right", 18, "var(--ink-faint)")
+  );
+  body.appendChild(head);
+  if (item.flag) body.appendChild(el("span", {class:"flag-pill", style:{color:accent, background:accent+"1f"}}, item.flag));
+  if (isOpen) {
+    body.appendChild(el("p", {class:"item-desc fade"}, item.d));
+    if (Array.isArray(item.links)) {
+      if (item.links.length > 0) {
+        const links = el("div", {class:"item-links fade"});
+        item.links.forEach(ln => {
+          const a = el("a", {
+            class:"item-link", href:ln.url, target:"_blank", rel:"noopener noreferrer",
+            style:{color: accent, borderBottomColor: accent+"55"},
+            onclick:(e)=>e.stopPropagation()
+          }, ln.label, " ", icon("i-chevron-right", 14));
+          links.appendChild(a);
+        });
+        body.appendChild(links);
+      } else if (Object.prototype.hasOwnProperty.call(item, "links")) {
+        body.appendChild(el("p", {class:"item-link-empty fade"}, "We're still verifying the official link for your province — search your provincial government site for the most current page."));
+      }
+    }
+  }
+  row.appendChild(body);
+  wrap.appendChild(row);
+  return wrap;
+}
+
+function renderPillarDetail(pid, items, withBack){
+  const p = PILLARS.find(x=>x.id===pid);
+  const root = el("div", {class:"fade"});
+  if (withBack) root.appendChild(backBtn());
+  root.appendChild(el("div", {class:"pillar-head"},
+    el("div", {class:"pillar-head-icon", style:{background:p.accent+"1f"}}, icon(p.icon, 28, p.accent)),
+    el("h2", {}, p.title)
+  ));
+  const list = el("div", {class:"item-list"});
+  items.forEach((it, i) => list.appendChild(renderItem(pid, it, i, p.accent)));
+  root.appendChild(list);
+  return root;
+}
+
+function renderBirthPillar(checklist){
+  const root = el("div", {class:"fade"});
+  root.appendChild(backBtn());
+  root.appendChild(el("div", {class:"pillar-head"},
+    el("div", {class:"pillar-head-icon", style:{background:C.olive+"1f"}}, icon("i-stethoscope", 28, C.olive)),
+    el("h2", {}, "Birth Prep")
+  ));
+  root.appendChild(el("h3", {style:{fontFamily:"var(--font-display)", fontSize:"22px", fontWeight:600, margin:"0 0 4px"}}, "Who will care for you through pregnancy & birth?"));
+  root.appendChild(el("p", {style:{color:"var(--ink-soft)", fontSize:"14px", margin:"0 0 18px"}}, "All three are covered by provincial health insurance in Canada. The right fit depends on your risk level and how you want to give birth."));
+  const grid = el("div", {class:"provider-grid", style:{marginBottom:"28px"}});
+  PROVIDERS.forEach(pr => {
+    const card = el("div", {class:"card provider-card", style:{borderTopColor: pr.color}});
+    card.appendChild(el("h3", {}, pr.name));
+    card.appendChild(el("div", {class:"provider-best", style:{color: pr.color}}, "Best for: " + pr.who));
+    const ul = el("ul", {class:"provider-list"});
+    pr.pts.forEach(x => ul.appendChild(el("li", {}, el("span", {class:"bullet", style:{color:pr.color}}, "·"), " " + x)));
+    card.appendChild(ul);
+    grid.appendChild(card);
+  });
+  root.appendChild(grid);
+  // checklist
+  const detail = renderPillarDetail("birth", checklist.birth, false);
+  root.appendChild(detail);
+  return root;
+}
+
+function renderTryingPillar(checklist){
+  const root = el("div", {class:"fade"});
+  root.appendChild(backBtn());
+  root.appendChild(el("div", {class:"pillar-head"},
+    el("div", {class:"pillar-head-icon", style:{background:C.sage+"1f"}}, icon("i-sprout", 28, C.sage)),
+    el("h2", {}, "Before You Try")
+  ));
+  // Editor pick or province-neutral
+  if (TWIG_PROVINCES.includes(state.province)) {
+    const card = el("div", {class:"pick-card"});
+    card.appendChild(el("div", {class:"pick-badge"},
+      icon("i-star", 16, C.terracotta), el("span",{},"Editor's pick")
+    ));
+    card.appendChild(el("h3", {}, EDITOR_PICK.name));
+    card.appendChild(el("p", {class:"pick-body"}, EDITOR_PICK.whyBase + " " + (EDITOR_PICK.cityNote[state.province]||"")));
+    card.appendChild(el("a", {class:"pick-link", href:EDITOR_PICK.url, target:"_blank", rel:"noopener noreferrer"},
+      "Visit twigfertility.com ", icon("i-chevron-right", 15)
+    ));
+    card.appendChild(el("p", {class:"pick-disclaimer"}, "A genuine recommendation, not a paid placement — and one clinic among many. Use the checklist below to compare any clinic against what matters to you."));
+    root.appendChild(card);
+  } else {
+    const card = el("div", {class:"pick-card"});
+    card.appendChild(el("div", {class:"pick-badge", style:{color:C.olive}},
+      icon("i-search", 16, C.olive), el("span",{},"Find a clinic near you")
+    ));
+    card.appendChild(el("h3", {style:{fontSize:"20px"}}, "Fertility clinics in " + provName(state.province)));
+    card.appendChild(el("p", {class:"pick-body", style:{marginBottom:0}}, "We don't feature a single pick in your province yet. Most provinces have several accredited clinics — use the checklist below to compare them, and ask your family doctor for a referral to start."));
+    root.appendChild(card);
+  }
+  // Criteria
+  const crit = el("div", {class:"criteria-card", style:{marginBottom:"28px"}});
+  crit.appendChild(el("div", {class:"criteria-head"},
+    icon("i-check", 18, C.olive), el("span",{},"How to choose a fertility clinic")
+  ));
+  const ul = el("ul", {class:"criteria-list"});
+  CLINIC_CRITERIA.forEach(x => ul.appendChild(el("li", {}, el("span",{class:"bullet"},"·")," "+x)));
+  crit.appendChild(ul);
+  root.appendChild(crit);
+  // checklist
+  root.appendChild(renderPillarDetail("trying", checklist.trying, false));
+  return root;
+}
+
+function renderFirstDays(){
+  const root = el("div", {class:"fade"});
+  root.appendChild(backBtn());
+  root.appendChild(el("div", {class:"pillar-head"},
+    el("div", {class:"pillar-head-icon", style:{background:C.dusk+"1f"}}, icon("i-sun", 28, C.dusk)),
+    el("h2", {}, "The First Few Days")
+  ));
+  const callout = el("div", {class:"health-callout"},
+    icon("i-phone", 22),
+    el("div", {style:{fontSize:"14px", lineHeight:1.45}},
+      el("strong", {}, "Not sure if something's normal? Call 811."),
+      " A registered nurse, free, day or night, in most provinces. For anything severe or frightening, go to emergency or call 911."
+    )
+  );
+  if (state.province === "ON") {
+    callout.lastChild.appendChild(el("div", {style:{marginTop:"8px"}},
+      el("a", {
+        class:"item-link health-link", href:LINKS.ON_811.url, target:"_blank", rel:"noopener noreferrer",
+        style:{color:C.blush, borderBottomColor:"rgba(237,213,213,.5)", fontSize:"13px"}
+      }, LINKS.ON_811.label, " ", icon("i-chevron-right", 13))
+    ));
+  }
+  root.appendChild(callout);
+  // Track toggle
+  const toggle = el("div", {class:"track-toggle"});
+  [["baby","For baby","i-baby"], ["you","For you (recovering)","i-heartpulse"]].forEach(([v,l,ic]) => {
+    toggle.appendChild(el("button", {
+      class:"track-btn" + (state.track===v?" selected":""),
+      onclick: () => setState({track:v})
+    }, icon(ic, 18, C.dusk), " " + l));
+  });
+  root.appendChild(toggle);
+  // items
+  const items = state.track==="baby" ? BABY_TRACK : YOU_TRACK;
+  const offset = state.track==="baby" ? 0 : BABY_TRACK.length;
+  const list = el("div", {class:"item-list"});
+  items.forEach((it, i) => {
+    const key = "firstdays-" + (offset+i);
+    const isDone = !!state.done[key];
+    const isOpen = state.openItem === key;
+    const wrap = el("div", {class:"item" + (isOpen?" open":""), style:{color:C.dusk}});
+    const row = el("div", {class:"item-row"});
+    const check = el("button", {
+      class:"item-check" + (isDone?" checked":""),
+      style:{background: isDone ? C.dusk : "transparent"},
+      onclick: (e) => { e.stopPropagation(); state.done[key]=!state.done[key]; render(); }
+    });
+    if (isDone) check.appendChild(icon("i-check", 16, "#fff"));
+    row.appendChild(check);
+    const body = el("div", {class:"item-body", onclick: ()=>setState({openItem: isOpen ? null : key})});
+    body.appendChild(el("div", {class:"item-head"},
+      el("span", {class:"item-title" + (isDone?" done":""), style:{color: isDone? "var(--ink-faint)":"var(--ink)"}}, it.t),
+      icon(isOpen ? "i-chevron-down" : "i-chevron-right", 18, "var(--ink-faint)")
+    ));
+    if (isOpen) body.appendChild(el("p", {class:"item-desc fade"}, it.d));
+    row.appendChild(body);
+    wrap.appendChild(row);
+    list.appendChild(wrap);
+  });
+  root.appendChild(list);
+  return root;
+}
+
+function renderMoneyPillar(checklist){
+  const root = el("div", {class:"fade"});
+  root.appendChild(backBtn());
+  // Estimator card
+  const card = el("div", {class:"estimator"});
+  card.appendChild(el("div", {class:"est-head"},
+    icon("i-dollar", 24, C.plum),
+    el("h2", {}, "What will actually land in your account?")
+  ));
+  card.appendChild(el("p", {class:"est-sub"},
+    "A rough estimate using 2026 EI maximums. " +
+    (state.province==="QC" ? "Quebec uses QPIP — treat this as directional only. " : "") +
+    "Not financial advice; Service Canada determines actual benefits."
+  ));
+  const grid = el("div", {class:"money-grid"});
+  // Left column — inputs
+  const left = el("div", {});
+  const salRow = el("div", {class:"slider-row"},
+    el("span", {class:"slider-label"}, "Your annual salary (before tax)"),
+    el("span", {class:"slider-value"}, "$" + state.salary.toLocaleString())
+  );
+  left.appendChild(salRow);
+  const salIn = el("input", {type:"range", min:20000, max:150000, step:1000, value:state.salary,
+    oninput: e => setState({salary: +e.target.value})});
+  left.appendChild(salIn);
+  left.appendChild(el("div", {style:{marginTop:"24px", marginBottom:"8px", fontSize:"14px", fontWeight:600}}, "Parental benefit option"));
+  const optRow = el("div", {class:"option-grid"});
+  [["std","Standard · 55%"],["ext","Extended · 33%"]].forEach(([v,l]) => {
+    optRow.appendChild(el("button", {
+      class:"option-btn" + (state.option===v?" selected":""),
+      onclick: () => setState({option:v})
+    }, l));
+  });
+  left.appendChild(optRow);
+  left.appendChild(el("div", {style:{marginTop:"24px"}},
+    el("div", {class:"slider-row"},
+      el("span", {class:"slider-label"}, "Employer top-up (% of salary)"),
+      el("span", {class:"slider-value"}, state.topupPct + "%")
+    )
+  ));
+  left.appendChild(el("input", {type:"range", min:0, max:100, step:5, value:state.topupPct,
+    oninput: e => setState({topupPct: +e.target.value})}));
+  left.appendChild(el("div", {style:{marginTop:"18px"}},
+    el("div", {class:"slider-row"},
+      el("span", {class:"slider-label"}, "Top-up duration (weeks)"),
+      el("span", {class:"slider-value"}, state.topupWeeks + " wk")
+    )
+  ));
+  left.appendChild(el("input", {type:"range", min:0, max:26, step:1, value:state.topupWeeks,
+    oninput: e => setState({topupWeeks: +e.target.value})}));
+  grid.appendChild(left);
+
+  // Right column — results
+  const est = calcEst();
+  const right = el("div", {class:"est-result"});
+  right.appendChild(el("div", {class:"est-label"}, "Estimated EI / week"));
+  right.appendChild(el("div", {class:"est-big"}, "$" + est.eiWeekly));
+  right.appendChild(el("div", {class:"est-cap"}, "capped at $" + (state.option==="std"?EI.maxStd:EI.maxExt) + "/wk in 2026"));
+  const mkRow = (k, v, hi, big) => {
+    const r = el("div", {class:"est-row" + (hi?" hi":"") + (big?" big":"")});
+    r.appendChild(el("span", {class:"est-row-k"}, k));
+    r.appendChild(el("span", {class:"est-row-v"}, v));
+    return r;
+  };
+  right.appendChild(mkRow("Covered weeks (mat + parental)", est.totalWeeks + " wk"));
+  right.appendChild(mkRow("EI over full leave", "$" + est.eiTotal.toLocaleString()));
+  if (state.topupPct>0 && state.topupWeeks>0) right.appendChild(mkRow("Employer top-up bonus (" + state.topupWeeks + " wk)", "+$" + est.topupBonus.toLocaleString(), true));
+  right.appendChild(el("div", {class:"est-divider"}));
+  right.appendChild(mkRow("Estimated total before tax", "$" + est.grand.toLocaleString(), false, true));
+  right.appendChild(el("p", {class:"est-foot"}, "EI is taxable — income tax is withheld. Low-income families may get the Family Supplement (up to 80%). Estimate ignores week-by-week top-up overlap nuances."));
+  grid.appendChild(right);
+
+  card.appendChild(grid);
+  root.appendChild(card);
+  // checklist below
+  root.appendChild(renderPillarDetail("money", checklist.money, false));
+  return root;
+}
+
+function renderBottomNav(){
+  const nav = $("#bottom-nav");
+  const main = $("#dashboard");
+  if (state.activePillar && state.province && state.stage) {
+    nav.classList.remove("hidden");
+    main.classList.add("has-bottom-nav");
+    nav.innerHTML = "";
+    const btn = el("button", {
+      onclick: () => { setState({activePillar:null, openItem:null}); window.scrollTo({top:0, behavior:"smooth"}); }
+    },
+      el("span", {style:{display:"inline-block", transform:"rotate(180deg)"}}, icon("i-chevron-right", 18, "#fff")),
+      el("span", {}, "Back to all pillars")
+    );
+    nav.appendChild(btn);
+  } else {
+    nav.classList.add("hidden");
+    main.classList.remove("has-bottom-nav");
+  }
+}
+
+/* ============== Master render ============== */
+function render(){
+  const onboarding = $("#onboarding");
+  const dash = $("#dashboard");
+  if (state.province && state.stage) {
+    onboarding.classList.add("hidden");
+    dash.classList.remove("hidden");
+  } else {
+    onboarding.classList.remove("hidden");
+    dash.classList.add("hidden");
+  }
+  renderProvGrid();
+  renderStageGrid();
+  renderCTA();
+  renderHeaderProv();
+  renderDashboard();
+  renderBottomNav();
+}
+
+/* init */
+render();
+</script>
+</body>
+</html>
